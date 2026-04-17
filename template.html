@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Letter №{{ letter_number }} · {{ date }} · The Sunday Letter</title>
+<meta name="description" content="A weekly note from your agent. What it did. What it learned. What it retired.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #EEEAE0;
+    --paper-2: #E7E2D3;
+    --paper-active: #F5F1E6;
+    --paper-edge: #D8D3C3;
+    --paper-hover: #EDE8DA;
+    --sky: #DBE0E8;
+
+    --ink: #1A1A1A;
+    --ink-2: #3A3A38;
+    --ink-muted: #6B6B6B;
+    --ink-soft: #8E8C87;
+    --ink-faint: #B5B1A6;
+
+    --firm: #1A4C2E;
+    --firm-bg: rgba(26, 76, 46, 0.08);
+    --soft: #8B6B1A;
+    --soft-bg: rgba(139, 107, 26, 0.08);
+    --guess: #8B4A1A;
+    --guess-bg: rgba(139, 74, 26, 0.08);
+    --retired: #6B1F1C;
+    --retired-bg: rgba(107, 31, 28, 0.05);
+
+    --rule: rgba(26, 26, 26, 0.10);
+    --rule-strong: rgba(26, 26, 26, 0.20);
+    --shadow-sm: 0 1px 2px rgba(26, 26, 26, 0.06);
+    --shadow-md: 0 4px 16px rgba(26, 26, 26, 0.08);
+    --shadow-lg: 0 20px 60px rgba(26, 26, 26, 0.12);
+
+    --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, 'Menlo', monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
+  body {
+    min-height: 100vh;
+    background:
+      linear-gradient(180deg, var(--sky) 0%, var(--paper) 220px, var(--paper) 100%);
+    background-attachment: fixed;
+    font-family: var(--font-ui);
+    color: var(--ink);
+    line-height: 1.55;
+    font-size: 15px;
+  }
+
+  /* ---------- TOP BAR ---------- */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 22px 40px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .wordmark {
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .wordmark .dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    background: var(--firm);
+    border-radius: 50%;
+    margin-right: 8px;
+    vertical-align: middle;
+    transform: translateY(-1px);
+  }
+  .meta-right {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ink-muted);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    display: flex;
+    gap: 18px;
+  }
+  .meta-right .dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: var(--ink-faint);
+    border-radius: 50%;
+    margin: 0 6px 1px 0;
+    vertical-align: middle;
+  }
+
+  /* ---------- CONTAINER ---------- */
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 24px 40px 80px;
+  }
+
+  /* ---------- NOTE CARD ---------- */
+  .note {
+    background: var(--paper-active);
+    border: 1px solid var(--paper-edge);
+    border-radius: 14px;
+    box-shadow: var(--shadow-lg);
+    padding: 56px 64px 48px;
+    animation: rise 0.5s ease both;
+  }
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .note { animation: none; }
+  }
+
+  .note-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 32px;
+  }
+  .note-meta-left {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ink-muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .note-meta-left .num {
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .note-meta-right {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ink-soft);
+    letter-spacing: 0.04em;
+  }
+
+  .note-title {
+    font-family: var(--font-ui);
+    font-size: 36px;
+    line-height: 1.15;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin: 0 0 12px;
+  }
+  .note-lede {
+    font-family: var(--font-ui);
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--ink-2);
+    margin: 0 0 40px;
+    max-width: 60ch;
+  }
+  .note-lede em {
+    font-style: italic;
+    color: var(--ink);
+  }
+
+  /* ---------- SECTIONS ---------- */
+  .section {
+    margin: 36px 0;
+  }
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+  .section-num {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ink-soft);
+    letter-spacing: 0.08em;
+    font-weight: 500;
+    min-width: 24px;
+  }
+  .section-title {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--ink-muted);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin: 0;
+  }
+
+  /* ---------- CONSEQUENCES (numbered list) ---------- */
+  .csq-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    counter-reset: csq;
+  }
+  .csq {
+    counter-increment: csq;
+    display: grid;
+    grid-template-columns: 36px 1fr;
+    gap: 12px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .csq:last-child { border-bottom: none; }
+  .csq::before {
+    content: counter(csq, decimal-leading-zero);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ink-faint);
+    letter-spacing: 0.06em;
+    padding-top: 4px;
+  }
+  .csq-tag {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    color: var(--firm);
+    background: var(--firm-bg);
+    padding: 3px 8px;
+    border-radius: 3px;
+    margin-bottom: 8px;
+  }
+  .csq-title {
+    font-family: var(--font-ui);
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.4;
+    margin: 0 0 4px;
+  }
+  .csq-body {
+    font-size: 14px;
+    color: var(--ink-2);
+    margin: 0 0 8px;
+    line-height: 1.55;
+  }
+  .csq-because {
+    font-size: 13px;
+    color: var(--ink-muted);
+    line-height: 1.5;
+    border-left: 2px solid var(--rule);
+    padding-left: 10px;
+    margin-top: 6px;
+  }
+
+  /* ---------- OBSERVATIONS (with calibration badges) ---------- */
+  .obs {
+    padding: 18px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .obs:last-child { border-bottom: none; }
+  .obs-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 3px;
+    white-space: nowrap;
+  }
+  .badge.firm { color: var(--firm); background: var(--firm-bg); }
+  .badge.soft { color: var(--soft); background: var(--soft-bg); }
+  .badge.guess { color: var(--guess); background: var(--guess-bg); }
+  .obs-when {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ink-soft);
+    letter-spacing: 0.04em;
+  }
+  .obs-title {
+    font-family: var(--font-ui);
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.4;
+    margin: 0 0 8px;
+    letter-spacing: -0.01em;
+  }
+  .obs-body {
+    font-size: 14px;
+    color: var(--ink-2);
+    line-height: 1.6;
+    margin: 0 0 12px;
+  }
+  .obs-evidence {
+    font-size: 13px;
+    color: var(--ink-muted);
+    line-height: 1.55;
+    border-left: 2px solid var(--ink-faint);
+    padding: 6px 12px;
+    background: rgba(255, 255, 255, 0.35);
+    border-radius: 0 4px 4px 0;
+    font-style: italic;
+  }
+  .obs-evidence::before {
+    content: "Evidence  ";
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-style: normal;
+    font-weight: 600;
+    color: var(--ink-faint);
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    margin-right: 4px;
+  }
+  .obs-prov {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--ink-faint);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-top: 8px;
+  }
+
+  /* ---------- RETIRED ---------- */
+  .retired-card {
+    background: var(--retired-bg);
+    border-left: 3px solid var(--retired);
+    border-radius: 0 6px 6px 0;
+    padding: 18px 20px;
+    margin-bottom: 12px;
+  }
+  .retired-old {
+    font-family: var(--font-ui);
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--ink-muted);
+    text-decoration: line-through;
+    text-decoration-color: var(--retired);
+    text-decoration-thickness: 1.5px;
+    margin: 0 0 10px;
+  }
+  .retired-arrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--retired);
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .retired-why {
+    font-size: 14px;
+    color: var(--ink-2);
+    line-height: 1.6;
+    margin: 0;
+  }
+  .retired-why strong { color: var(--ink); font-weight: 600; }
+
+  /* ---------- GAP ---------- */
+  .gap-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .gap-cell {
+    padding: 18px 20px;
+  }
+  .gap-cell + .gap-cell {
+    border-left: 1px solid var(--rule);
+  }
+  .gap-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--ink-faint);
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .gap-value {
+    font-family: var(--font-ui);
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--ink);
+    line-height: 1.4;
+    margin: 0 0 6px;
+  }
+  .gap-count {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ink-soft);
+    letter-spacing: 0.04em;
+  }
+  @media (max-width: 600px) {
+    .gap-grid { grid-template-columns: 1fr; }
+    .gap-cell + .gap-cell { border-left: none; border-top: 1px solid var(--rule); }
+  }
+
+  /* ---------- BECOMING ---------- */
+  .becoming-card {
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 20px 22px;
+    background: rgba(255, 255, 255, 0.30);
+  }
+  .becoming-title {
+    font-family: var(--font-ui);
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ink);
+    margin: 0 0 10px;
+    letter-spacing: -0.01em;
+  }
+  .becoming-body {
+    font-size: 14px;
+    color: var(--ink-2);
+    line-height: 1.6;
+    margin: 0;
+  }
+  .becoming-body em { font-style: italic; color: var(--ink); }
+
+  /* ---------- QUESTION ---------- */
+  .question-block {
+    border-top: 1px solid var(--rule-strong);
+    margin-top: 48px;
+    padding-top: 32px;
+  }
+  .question-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--ink-faint);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .question {
+    font-family: var(--font-ui);
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--ink);
+    line-height: 1.4;
+    letter-spacing: -0.015em;
+    margin: 0 0 14px;
+    max-width: 56ch;
+  }
+  .question strong { font-weight: 700; color: var(--ink); }
+  .question-note {
+    font-size: 13px;
+    color: var(--ink-muted);
+    line-height: 1.55;
+    margin: 0;
+    max-width: 56ch;
+    font-style: italic;
+  }
+
+  /* ---------- CLOSE ---------- */
+  .note-close {
+    border-top: 1px solid var(--rule);
+    margin-top: 48px;
+    padding-top: 28px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .signoff {
+    font-size: 14px;
+    color: var(--ink-2);
+    line-height: 1.5;
+  }
+  .signoff-line {
+    color: var(--ink-muted);
+    margin-bottom: 4px;
+  }
+  .sig-name {
+    font-family: var(--font-ui);
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .close-mark {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ink-faint);
+    letter-spacing: 0.40em;
+  }
+
+  /* ---------- FOOTER LINKS ---------- */
+  .note-foot {
+    margin-top: 32px;
+    padding-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .note-foot-left {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ink-soft);
+    letter-spacing: 0.04em;
+  }
+  .note-foot-right a {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ink-muted);
+    text-decoration: none;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-left: 16px;
+    transition: color 0.15s;
+  }
+  .note-foot-right a:hover { color: var(--ink); }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width: 720px) {
+    .topbar { padding: 18px 20px; }
+    .container { padding: 16px 16px 60px; }
+    .note { padding: 32px 24px 32px; border-radius: 10px; }
+    .note-title { font-size: 28px; }
+    .question { font-size: 19px; }
+    .csq { grid-template-columns: 28px 1fr; gap: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="wordmark" href="#"><span class="dot"></span>The Sunday Letter</a>
+  <div class="meta-right">
+    <span><span class="dot"></span>Letter №{{ letter_number }}</span>
+    <span>{{ date }}</span>
+  </div>
+</header>
+
+<main class="container">
+  <article class="note">
+
+    <div class="note-meta">
+      <div class="note-meta-left">
+        <span class="num">№{{ letter_number }}</span> &nbsp;·&nbsp; {{ date }} &nbsp;·&nbsp; for {{ name }}
+      </div>
+      <div class="note-meta-right">
+        Calibration {{ calibration_pct }}% · {{ tracking_signals }} signals
+      </div>
+    </div>
+
+    <h1 class="note-title">{{ hero_headline }}</h1>
+    <p class="note-lede">{{ hero_lede | safe }}</p>
+
+    {% if consequences %}
+    <section class="section">
+      <div class="section-head">
+        <span class="section-num">01</span>
+        <h2 class="section-title">What I did this week</h2>
+      </div>
+      <ol class="csq-list">
+        {% for c in consequences %}
+        <li class="csq">
+          <div>
+            <span class="csq-tag">{{ c.tag }}</span>
+            <h3 class="csq-title">{{ c.title }}</h3>
+            <p class="csq-body">{{ c.body | safe }}</p>
+            {% if c.because %}<div class="csq-because">{{ c.because | safe }}</div>{% endif %}
+          </div>
+        </li>
+        {% endfor %}
+      </ol>
+    </section>
+    {% endif %}
+
+    {% if observations %}
+    <section class="section">
+      <div class="section-head">
+        <span class="section-num">02</span>
+        <h2 class="section-title">What I learned about you</h2>
+      </div>
+      {% for o in observations %}
+      <div class="obs">
+        <div class="obs-head">
+          <span class="badge {{ o.hedge_class }}">{{ o.hedge_label }}</span>
+          {% if o.learned_date %}<span class="obs-when">· {{ o.learned_date }}</span>{% endif %}
+        </div>
+        <h3 class="obs-title">{{ o.title }}</h3>
+        <p class="obs-body">{{ o.body | safe }}</p>
+        {% if o.evidence %}<div class="obs-evidence">{{ o.evidence | safe }}</div>{% endif %}
+        {% if o.provenance %}<div class="obs-prov">{{ o.provenance }}</div>{% endif %}
+      </div>
+      {% endfor %}
+    </section>
+    {% endif %}
+
+    {% if retired %}
+    <section class="section">
+      <div class="section-head">
+        <span class="section-num">03</span>
+        <h2 class="section-title">What I retired</h2>
+      </div>
+      {% for r in retired %}
+      <div class="retired-card">
+        <p class="retired-old">{{ r.old_belief }}</p>
+        <div class="retired-arrow">→ Replaced because</div>
+        <p class="retired-why">{{ r.why | safe }}</p>
+      </div>
+      {% endfor %}
+    </section>
+    {% endif %}
+
+    {% if gap %}
+    <section class="section">
+      <div class="section-head">
+        <span class="section-num">04</span>
+        <h2 class="section-title">The gap (stated vs. revealed)</h2>
+      </div>
+      <div class="gap-grid">
+        <div class="gap-cell">
+          <div class="gap-label">You said</div>
+          <p class="gap-value">{{ gap.stated }}</p>
+          <div class="gap-count">{{ gap.stated_count }}</div>
+        </div>
+        <div class="gap-cell">
+          <div class="gap-label">You did</div>
+          <p class="gap-value">{{ gap.revealed }}</p>
+          <div class="gap-count">{{ gap.revealed_count }}</div>
+        </div>
+      </div>
+    </section>
+    {% endif %}
+
+    {% if becoming %}
+    <section class="section">
+      <div class="section-head">
+        <span class="section-num">05</span>
+        <h2 class="section-title">What you're becoming</h2>
+      </div>
+      <div class="becoming-card">
+        <h3 class="becoming-title">{{ becoming.title }}</h3>
+        <p class="becoming-body">{{ becoming.body | safe }}</p>
+      </div>
+    </section>
+    {% endif %}
+
+    {% if question %}
+    <section class="question-block">
+      <div class="question-label">06 · One question</div>
+      <p class="question">{{ question | safe }}</p>
+      {% if question_note %}<p class="question-note">{{ question_note }}</p>{% endif %}
+    </section>
+    {% endif %}
+
+    <div class="note-close">
+      <div class="signoff">
+        <div class="signoff-line">{{ closing_line }}</div>
+        <div class="sig-name">Claude</div>
+      </div>
+      <div class="close-mark">× × ×</div>
+    </div>
+
+    <div class="note-foot">
+      <div class="note-foot-left">{{ tracking_conversations }} conversations · {{ hours_saved }} hours saved · {{ exports }} exports</div>
+      <div class="note-foot-right">
+        <a href="#">Pause</a>
+        <a href="#">Export</a>
+        <a href="#">Archive</a>
+      </div>
+    </div>
+
+  </article>
+</main>
+
+</body>
+</html>

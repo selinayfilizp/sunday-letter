@@ -1,0 +1,17 @@
+{
+  "name": "sunday-letter",
+  "version": "0.1.0",
+  "description": "A weekly letter from your agent. Every Sunday at 6pm, it reports what it did for you, what it learned about you, what it stopped believing, and one question worth sitting with.",
+  "author": {
+    "name": "The Sunday Letter"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/sunday-letter/sunday-letter",
+  "keywords": [
+    "preference-learning",
+    "weekly-digest",
+    "reflection",
+    "personal-agent",
+    "sunday"
+  ]
+}
