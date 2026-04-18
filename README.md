@@ -4,7 +4,9 @@ A weekly note from your AI agent, about you. What it did for you. What it learne
 
 ## What this is
 
-The Sunday Letter is a portable contract for AI agents. Once a week, the agent files a short, structured letter. Default is silence: if nothing meaningful changed, no letter ships.
+The Sunday Letter is a portable contract for AI agents. Once a week, at a **day and time you configure** (Sunday evening is the default story, not a hard requirement), the agent files a short, structured letter. Default is silence: if nothing meaningful changed, no letter ships.
+
+After install, run `/subscribe-sunday-letter` to pick **weekday, wall-clock time, and optional IANA timezone**; see `commands/subscribe-sunday-letter.md` and `skills/sunday-letter/references/schedule-config.example.json`.
 
 Every letter obeys six rules:
 
@@ -61,7 +63,8 @@ Open `my-letter.html` in a browser. That's it.
 │       ├── system-prompt.md       portable agent prompt for any LLM
 │       ├── schema.md              JSON schema for weekly signals
 │       ├── design-principles.md   the design contract
-│       └── example-signals.json   complete worked example (Teddy, cheesemonger)
+│       ├── example-signals.json   complete worked example (Teddy, cheesemonger)
+│       └── schedule-config.example.json  weekly slot (day, time, tz, cron)
 ├── docs/                          static site (landing page, sample letter, install page)
 ├── generate_letter.py             top-level renderer for direct Python use
 ├── template.html                  top-level template

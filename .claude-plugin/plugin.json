@@ -1,12 +1,12 @@
 {
   "name": "sunday-letter",
   "version": "0.1.0",
-  "description": "A weekly letter from your agent. Every Sunday at 6pm, it reports what it did for you, what it learned about you, what it stopped believing, and one question worth sitting with.",
+  "description": "A weekly letter from your agent at a day and time you configure (Sunday 6pm is the default). It reports what it did for you, what it learned, what it stopped believing, and one question worth sitting with.",
   "author": {
     "name": "The Sunday Letter"
   },
   "license": "MIT",
-  "homepage": "https://github.com/sunday-letter/sunday-letter",
+  "homepage": "https://github.com/selinayfilizp/sunday-letter",
   "keywords": [
     "preference-learning",
     "weekly-digest",

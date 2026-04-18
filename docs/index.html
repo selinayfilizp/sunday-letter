@@ -1065,7 +1065,7 @@
   <div class="hero-lede">
     <div class="hero-eyebrow">An open experiment · est. 2026</div>
     <h1>A weekly note from your AI, about <em>you</em>.</h1>
-    <p class="hero-sub">Every Sunday, your agent writes you a short letter. What it did for you that week. What it learned about you. What it stopped believing. And one real question, worth sitting with. The whole history is kept as an archive you can flip back through, not a letter you throw away.</p>
+    <p class="hero-sub">Once a week, at a day and time you choose, your agent writes you a short letter. What it did for you that week. What it learned about you. What it stopped believing. And one real question, worth sitting with. The whole history is kept as an archive you can flip back through, not a letter you throw away.</p>
     <div class="hero-meta">
       <span>Works with any AI agent</span>
       <span>Default is silence, if nothing changed, no letter</span>
@@ -1088,7 +1088,7 @@
     <div class="how-arrow">→</div>
     <div class="how-step">
       <div class="how-num">03</div>
-      <div class="how-text"><strong>Sunday at six.</strong> A short letter lands. Read it in two minutes. Argue with it. Reply by voice memo, or don't.</div>
+      <div class="how-text"><strong>Your weekly slot.</strong> Pick the day and time in <code style="font-size:12px;">/subscribe-sunday-letter</code>. A short letter lands then. Read it in two minutes. Argue with it. Reply by voice memo, or don't.</div>
     </div>
   </div>
 </div>
@@ -1385,7 +1385,7 @@
             <div class="install-option">
               <div class="install-option-label">For Cowork users</div>
               <h3>Download the plugin</h3>
-              <p>Drag the <code>.plugin</code> file into Cowork, restart the session, and the skill loads. The first Sunday after install is when you'll see your first letter.</p>
+              <p>Drag the <code>.plugin</code> file into Cowork, restart the session, and the skill loads. After you subscribe, your first letter arrives on the <strong>next</strong> weekly slot you configured (default is Sunday evening).</p>
               <a class="install-cta" href="sunday-letter.plugin" download>Download sunday-letter.plugin →</a>
             </div>
 
@@ -1406,7 +1406,7 @@
               </div>
               <ul class="byo-list">
                 <li><strong>system-prompt.md</strong>, the agent instructions, what to track, when to ship, when to stay silent</li>
-                <li><strong>schema.md</strong>, the JSON shape your agent fills in each Sunday</li>
+                <li><strong>schema.md</strong>, the JSON shape your agent fills in on each weekly run</li>
                 <li><strong>template.html</strong>, the Archive design, render with any templating engine</li>
               </ul>
             </div>
@@ -1438,7 +1438,7 @@
               <div class="beginner-step-num">Step 3</div>
               <div class="beginner-step-body">
                 <strong>Drop the file in.</strong>
-                <p>In Cowork, drag the file into the chat or into the Plugins folder. In other agents, upload it and tell the agent: <em>"Use this skill from now on. Write me a Sunday Letter every week."</em></p>
+                <p>In Cowork, drag the file into the chat or into the Plugins folder. In other agents, upload it and tell the agent: <em>"Use this skill from now on. Write me a Sunday Letter every week at a time I choose."</em> Then run <code>/subscribe-sunday-letter</code> (or equivalent) to set the day and time.</p>
               </div>
             </li>
             <li>
@@ -1451,8 +1451,8 @@
             <li>
               <div class="beginner-step-num">Step 5</div>
               <div class="beginner-step-body">
-                <strong>Wait until Sunday.</strong>
-                <p>Sunday at 6 PM, your first letter shows up. If your agent didn't learn anything meaningful that week, it stays silent. That's intentional.</p>
+                <strong>Wait for your slot.</strong>
+                <p>After you subscribe, the letter shows up each week on the day and time you picked (Sunday 6 PM is the default). If your agent didn't learn anything meaningful that week, it stays silent. That's intentional. <a href="subscribe.html#schedule" style="color:var(--firm);font-weight:600;">Build your cron on the install page →</a></p>
               </div>
             </li>
           </ol>
@@ -1466,6 +1466,8 @@
             <div class="faq-a">Tell your agent. It'll retire the belief in the next letter, with a visible strikethrough so you can see it changed its mind.</div>
             <div class="faq-q">Does it cost anything?</div>
             <div class="faq-a">No. The plugin is free, MIT licensed. You only pay whatever your AI agent already costs you.</div>
+            <div class="faq-q">Can I get letters on a different day or time?</div>
+            <div class="faq-a">Yes. Run <code>/subscribe-sunday-letter</code> and pick any weekday and wall-clock time. Run it again anytime to reschedule. Use the <a href="subscribe.html#schedule">cron builder on the install page</a> if you are wiring your own scheduler.</div>
           </div>
         </aside>
 

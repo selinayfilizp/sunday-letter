@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Install · The Sunday Letter</title>
-<meta name="description" content="Install the Sunday Letter as a plugin for your agent. One letter per Sunday, only when something has changed.">
+<meta name="description" content="Install the Sunday Letter as a plugin for your agent. One letter per week at a day and time you choose, only when something has changed.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -282,6 +282,73 @@
     letter-spacing: 0.06em;
   }
 
+  /* SCHEDULE BUILDER */
+  .schedule-panel {
+    margin-top: 24px;
+    padding-top: 22px;
+    border-top: 1px solid var(--rule-strong);
+  }
+  .schedule-panel h3 {
+    font-family: var(--font-ui);
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ink);
+    margin: 0 0 8px;
+    letter-spacing: -0.015em;
+  }
+  .schedule-panel > p {
+    font-size: 13px;
+    color: var(--ink-muted);
+    margin: 0 0 16px;
+    line-height: 1.55;
+    max-width: 62ch;
+  }
+  .schedule-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 18px;
+    align-items: end;
+  }
+  .schedule-field label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 6px;
+  }
+  .schedule-field select,
+  .schedule-field input[type="time"] {
+    width: 100%;
+    font-family: var(--font-ui);
+    font-size: 14px;
+    color: var(--ink);
+    background: rgba(255, 255, 255, 0.45);
+    border: 1px solid var(--rule-strong);
+    border-radius: 6px;
+    padding: 10px 12px;
+  }
+  .schedule-field-full { grid-column: 1 / -1; }
+  .schedule-output {
+    margin-top: 18px;
+  }
+  .schedule-output .code { margin-top: 8px; }
+  .schedule-hint {
+    font-size: 12px;
+    color: var(--ink-muted);
+    margin-top: 12px;
+    line-height: 1.5;
+    max-width: 62ch;
+  }
+  .schedule-hint code {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    background: rgba(26, 26, 26, 0.06);
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+
   /* CONTRACT LIST */
   .contract {
     list-style: none;
@@ -343,6 +410,7 @@
     .hero h1 { font-size: 32px; }
     .hero p { font-size: 15px; }
     .code { flex-direction: column; align-items: flex-start; }
+    .schedule-fields { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -353,7 +421,7 @@
   <nav>
     <a href="index.html">Sample</a>
     <a href="index.html#philosophy">Philosophy</a>
-    <a href="https://github.com/sundayletter/plugin">GitHub</a>
+    <a href="https://github.com/selinayfilizp/sunday-letter">GitHub</a>
   </nav>
 </header>
 
@@ -362,7 +430,7 @@
   <section class="hero">
     <div class="hero-eyebrow">Install · v0.1</div>
     <h1>Add it to your agent.</h1>
-    <p>The Sunday Letter ships as a Cowork plugin. Install once. Subscribe to the weekly schedule. Receive a letter, only when something has actually changed.</p>
+    <p>The Sunday Letter ships as a Cowork plugin. Install once. Subscribe to a weekly slot, any weekday and time you like. Receive a letter only when something has actually changed.</p>
   </section>
 
   <div class="card">
@@ -395,22 +463,29 @@
   <div class="card">
     <div class="card-meta">Step 02 · Subscribe</div>
     <h2>Tell your agent when to write.</h2>
-    <p class="lede">Once installed, run <code style="font-family:var(--font-mono);font-size:12px;color:var(--ink);background:rgba(26,26,26,0.06);padding:1px 5px;border-radius:3px;">/subscribe-sunday-letter</code> in Claude. You'll be asked to pick a cadence:</p>
+    <p class="lede">Once installed, run <code style="font-family:var(--font-mono);font-size:12px;color:var(--ink);background:rgba(26,26,26,0.06);padding:1px 5px;border-radius:3px;">/subscribe-sunday-letter</code> in Claude. You'll pick a <strong>weekly</strong> slot: which day, which time, and optionally which timezone (IANA, e.g. <code style="font-family:var(--font-mono);font-size:11px;">Europe/Berlin</code>). Run the command again anytime to reschedule.</p>
 
     <div class="options">
       <div class="option">
         <div class="option-text">
-          <strong>Every Sunday at 6:00 PM</strong>
-          <span>The default. Most people pick this.</span>
+          <strong>Sunday at 6:00 PM</strong>
+          <span>The default story. Cron uses your scheduler's local clock unless you set a timezone on the task.</span>
         </div>
         <div class="option-meta">0 18 * * 0</div>
       </div>
       <div class="option">
         <div class="option-text">
-          <strong>Every Sunday at a time you choose</strong>
-          <span>Morning coffee, evening wind-down, your call.</span>
+          <strong>Same day, different time</strong>
+          <span>Keep Sunday, move the hour—for example morning coffee before the week starts.</span>
         </div>
-        <div class="option-meta">0 H * * 0</div>
+        <div class="option-meta">30 9 * * 0</div>
+      </div>
+      <div class="option">
+        <div class="option-text">
+          <strong>Another weekday + time</strong>
+          <span>Monday debrief, Friday wind-down, Wednesday lunch—your rhythm, not ours.</span>
+        </div>
+        <div class="option-meta">30 19 * * 4</div>
       </div>
       <div class="option">
         <div class="option-text">
@@ -419,6 +494,39 @@
         </div>
         <div class="option-meta">manual</div>
       </div>
+    </div>
+
+    <div class="schedule-panel" id="schedule">
+      <h3>Build your cron line</h3>
+      <p>Pick a day and time. Copy the five-field cron expression into your agent or scheduler. Format is <code>minute hour * * dayOfWeek</code> where <code>0</code> is Sunday and <code>6</code> is Saturday.</p>
+      <div class="schedule-fields">
+        <div class="schedule-field">
+          <label for="sched-dow">Day of week</label>
+          <select id="sched-dow" aria-label="Day of week">
+            <option value="0">Sunday</option>
+            <option value="1">Monday</option>
+            <option value="2">Tuesday</option>
+            <option value="3">Wednesday</option>
+            <option value="4">Thursday</option>
+            <option value="5">Friday</option>
+            <option value="6">Saturday</option>
+          </select>
+        </div>
+        <div class="schedule-field">
+          <label for="sched-time">Local time</label>
+          <input type="time" id="sched-time" value="18:00" aria-label="Time of day">
+        </div>
+      </div>
+      <div class="schedule-output">
+        <div class="schedule-field schedule-field-full">
+          <label>Cron expression</label>
+          <div class="code">
+            <span id="sched-cron-out">0 18 * * 0</span>
+            <button type="button" id="sched-copy" aria-label="Copy cron">Copy</button>
+          </div>
+        </div>
+      </div>
+      <p class="schedule-hint">Tell your agent your <strong>IANA timezone</strong> if it can set <code>CRON_TZ</code> or a per-task zone; otherwise choose the wall time that matches where the schedule runs. Example saved config: <a href="https://github.com/selinayfilizp/sunday-letter/blob/main/skills/sunday-letter/references/schedule-config.example.json" style="color:var(--firm);font-weight:600;">schedule-config.example.json</a> (same file ships in the plugin under <code>skills/sunday-letter/references/</code>).</p>
     </div>
   </div>
 
@@ -441,12 +549,43 @@
     <div>The Sunday Letter · v0.1 · MIT</div>
     <div>
       <a href="index.html">Sample</a>
-      <a href="https://github.com/sundayletter/plugin">GitHub</a>
+      <a href="https://github.com/selinayfilizp/sunday-letter">GitHub</a>
       <a href="sunday-letter.plugin" download>Download</a>
     </div>
   </footer>
 
 </main>
+
+<script>
+(function () {
+  var dow = document.getElementById('sched-dow');
+  var time = document.getElementById('sched-time');
+  var out = document.getElementById('sched-cron-out');
+  var btn = document.getElementById('sched-copy');
+  function pad(n) { return n < 10 ? '0' + n : String(n); }
+  function updateCron() {
+    if (!dow || !time || !out) return;
+    var parts = time.value.split(':');
+    var h = parseInt(parts[0], 10);
+    var m = parseInt(parts[1], 10);
+    if (isNaN(h) || isNaN(m)) return;
+    out.textContent = pad(m) + ' ' + h + ' * * ' + dow.value;
+  }
+  if (dow && time && out) {
+    dow.addEventListener('change', updateCron);
+    time.addEventListener('input', updateCron);
+    updateCron();
+  }
+  if (btn && out) {
+    btn.addEventListener('click', function () {
+      navigator.clipboard.writeText(out.textContent).then(function () {
+        btn.textContent = 'Copied';
+        setTimeout(function () { btn.textContent = 'Copy'; }, 2000);
+      });
+    });
+  }
+})();
+</script>
 
 </body>
 </html>

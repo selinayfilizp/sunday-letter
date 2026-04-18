@@ -1,6 +1,6 @@
 ---
 name: sunday-letter
-description: Write a weekly Sunday Letter, a reflective note from the agent to the user that reports what it did that week, what it learned about them, what it stopped believing, and one question worth sitting with. Use when the user says "write my Sunday letter", "it's Sunday, reflect on the week", "what did you learn about me this week", "send me my weekly letter", "do a weekly reflection", or when a scheduled task named "sunday-letter" is firing. Produces a single rendered HTML note, Archive aesthetic: warm cream paper, Inter + JetBrains Mono, numbered sections, visible calibration badges (FIRM / SOFT / GUESS), three ×'s at the close.
+description: Write a weekly Sunday Letter, a reflective note from the agent to the user that reports what it did that week, what it learned about them, what it stopped believing, and one question worth sitting with. The delivery day and time are configurable via /subscribe-sunday-letter. Use when the user says "write my Sunday letter", "it's Sunday, reflect on the week", "what did you learn about me this week", "send me my weekly letter", "do a weekly reflection", or when a scheduled task named "sunday-letter" is firing. Produces a single rendered HTML note, Archive aesthetic: warm cream paper, Inter + JetBrains Mono, numbered sections, visible calibration badges (FIRM / SOFT / GUESS), three ×'s at the close.
 ---
 
 # Sunday Letter
@@ -12,6 +12,10 @@ Write a weekly letter from the agent to the user. The letter is not a dashboard 
 - The user asks for a Sunday Letter (by name, paraphrase, or scheduled trigger).
 - A scheduled task named `sunday-letter` or similar is invoking you.
 - The user asks "what did you learn about me this week" or "what changed in how you think about me".
+
+## When the letter runs (delivery slot)
+
+The product name says Sunday; the **schedule is configurable**. Users set **day of week, time of day, and optionally timezone** via `/subscribe-sunday-letter` (see `commands/subscribe-sunday-letter.md`). When a trigger fires, run this skill the same way regardless of which weekday they chose. If they store preferences, use the same JSON shape as `references/schedule-config.example.json`.
 
 ## The contract (non-negotiable)
 
