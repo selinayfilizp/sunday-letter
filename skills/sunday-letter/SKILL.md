@@ -1,6 +1,6 @@
 ---
 name: sunday-letter
-description: Write a weekly Sunday Letter, a reflective note from the agent to the user that reports what it did that week, what it learned about them, what it stopped believing, and one question worth sitting with. The delivery day and time are configurable via /subscribe-sunday-letter. Use when the user says "write my Sunday letter", "it's Sunday, reflect on the week", "what did you learn about me this week", "send me my weekly letter", "do a weekly reflection", or when a scheduled task named "sunday-letter" is firing. Produces a single rendered HTML note, Archive aesthetic: warm cream paper, Inter + JetBrains Mono, numbered sections, visible calibration badges (FIRM / SOFT / GUESS), three ×'s at the close.
+description: Write a weekly Sunday Letter, a reflective note from the agent to the user that reports what it did that week, what it learned about them, what it stopped believing, and one question worth sitting with. Use when the user says "write my Sunday letter", "it's Sunday, reflect on the week", "what did you learn about me this week", "send me my weekly letter", "do a weekly reflection", or when a scheduled task named "sunday-letter" is firing. Produces a single rendered HTML note, Archive aesthetic: warm cream paper, Inter + JetBrains Mono, numbered sections, visible calibration badges (FIRM / SOFT / GUESS), three ×'s at the close.
 ---
 
 # Sunday Letter
@@ -12,10 +12,6 @@ Write a weekly letter from the agent to the user. The letter is not a dashboard 
 - The user asks for a Sunday Letter (by name, paraphrase, or scheduled trigger).
 - A scheduled task named `sunday-letter` or similar is invoking you.
 - The user asks "what did you learn about me this week" or "what changed in how you think about me".
-
-## When the letter runs (delivery slot)
-
-The product name says Sunday; the **schedule is configurable**. Users set **day of week, time of day, and optionally timezone** via `/subscribe-sunday-letter` (see `commands/subscribe-sunday-letter.md`). When a trigger fires, run this skill the same way regardless of which weekday they chose. If they store preferences, use the same JSON shape as `references/schedule-config.example.json`.
 
 ## The contract (non-negotiable)
 
@@ -34,14 +30,28 @@ Read `references/design-principles.md` for the reasoning behind these rules and 
 
 ### Step 1, Gather the week's signal
 
-Look back over the user's last 7 days of conversations with you. You need enough material to answer:
+Look back over the user's last 7 days of conversations with you. This must use real conversation history, not just the current thread, whenever the host makes history available.
 
-- What did I do for them this week (drafts, filters, decisions, declines, shortlists)?
+**In Codex Desktop:** run the local collector before extracting signals:
+
+```bash
+python3 scripts/collect_codex_context.py --days 7 --out codex-weekly-context.md
+```
+
+Then read `codex-weekly-context.md` and treat it as the source transcript bundle for the week. The collector reads the user's local Codex thread database and rollout JSONL files from `~/.codex`; it does not call a network service.
+
+**In Claude/Cowork:** use the available conversation history or scheduled-task context tool. If the host does not expose a history API, say that clearly and do not pretend to have seven days of context.
+
+You need enough material to answer:
+
+- What did I do for them this week (drafts, filters, commits, builds, documents, declines, shortlists)?
+- What did we decide this week?
+- What tasks or open loops still need to be carried forward?
 - What patterns repeated? What did they engage with at length? What did they dismiss quickly?
 - Where did my predictions about their preferences turn out wrong?
 - What's new this week that I didn't know last week?
 
-If you have access to a conversation history tool, use it. If not, rely on what's in context and note the limitation honestly in the letter (don't hallucinate transcript content).
+If no conversation-history source is available, rely on what's in context and note the limitation honestly in the letter. Do not hallucinate transcript content.
 
 ### Step 2, Extract structured signals
 
@@ -49,7 +59,7 @@ Write a JSON object matching the schema in `references/schema.md`. The structure
 
 ```
 name, letter_number, date, calibration_pct, total_prefs, hours_saved,
-hero_lede, consequences[], observations[], retired[], gap,
+hero_lede, consequences[], decisions[], open_tasks[], observations[], retired[], gap,
 becoming, question, preferences[], daily_shape[]
 ```
 
@@ -73,7 +83,7 @@ You have two paths:
 
 **Path B (if Python is available):** Run `scripts/generate_letter.py --signals <your_signals.json> --out letter.html` to render via Jinja. This requires `jinja2` to be installed.
 
-Either path, the final file is a single self-contained HTML file, Google Fonts via `<link>`, all styling inline, no external scripts.
+The renderer has a dependency-free fallback in Codex, so `jinja2` is optional for offline preview and scheduled local runs. Either path, the final file is a single self-contained HTML file, Google Fonts via `<link>`, all styling inline, no external scripts.
 
 ### Step 5, Deliver
 

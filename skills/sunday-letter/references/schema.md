@@ -59,6 +59,31 @@ At least 2, at most 4. Each must be an action actually taken, not a plan.
 
 Use `firm` only with 5+ consistent signals. `soft` for 2–4. `guess` for new patterns.
 
+### `decisions`, what got decided this week
+
+Concrete decisions the user and agent converged on. State these as outcomes, not vague themes.
+
+```json
+{
+  "title": "Launch navigation should use Feed / Shelf / Activity / Profile.",
+  "body": "Folio was renamed to Feed, Index became Activity, and Profile replaced Me.",
+  "provenance": "May 9 · Selo launch UX thread"
+}
+```
+
+### `open_tasks`, tasks or open loops still worth carrying forward
+
+Only include tasks that remain useful next week. Avoid dumping every small todo.
+
+```json
+{
+  "title": "Submit latest TestFlight build to external testers.",
+  "body": "External testers could only see an older build until Apple approved the newer build.",
+  "owner": "Selinay / Codex",
+  "provenance": "May 9 · TestFlight review thread"
+}
+```
+
 ### `retired`, beliefs the agent stopped holding
 
 ```json

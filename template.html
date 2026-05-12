@@ -597,10 +597,41 @@
     </section>
     {% endif %}
 
-    {% if observations %}
+    {% if decisions or open_tasks %}
     <section class="section">
       <div class="section-head">
         <span class="section-num">02</span>
+        <h2 class="section-title">Decisions and open loops</h2>
+      </div>
+      <ol class="csq-list">
+        {% for d in decisions %}
+        <li class="csq">
+          <div>
+            <span class="csq-tag">Decision</span>
+            <h3 class="csq-title">{{ d.title }}</h3>
+            <p class="csq-body">{{ d.body | safe }}</p>
+            {% if d.provenance %}<div class="csq-because">{{ d.provenance }}</div>{% endif %}
+          </div>
+        </li>
+        {% endfor %}
+        {% for t in open_tasks %}
+        <li class="csq">
+          <div>
+            <span class="csq-tag">Open loop</span>
+            <h3 class="csq-title">{{ t.title }}</h3>
+            <p class="csq-body">{{ t.body | safe }}</p>
+            {% if t.owner or t.provenance %}<div class="csq-because">{% if t.owner %}Owner: {{ t.owner }}{% endif %}{% if t.owner and t.provenance %} · {% endif %}{{ t.provenance }}</div>{% endif %}
+          </div>
+        </li>
+        {% endfor %}
+      </ol>
+    </section>
+    {% endif %}
+
+    {% if observations %}
+    <section class="section">
+      <div class="section-head">
+        <span class="section-num">03</span>
         <h2 class="section-title">What I learned about you</h2>
       </div>
       {% for o in observations %}
@@ -621,7 +652,7 @@
     {% if retired %}
     <section class="section">
       <div class="section-head">
-        <span class="section-num">03</span>
+        <span class="section-num">04</span>
         <h2 class="section-title">What I retired</h2>
       </div>
       {% for r in retired %}
@@ -637,7 +668,7 @@
     {% if gap %}
     <section class="section">
       <div class="section-head">
-        <span class="section-num">04</span>
+        <span class="section-num">05</span>
         <h2 class="section-title">The gap (stated vs. revealed)</h2>
       </div>
       <div class="gap-grid">
@@ -658,7 +689,7 @@
     {% if becoming %}
     <section class="section">
       <div class="section-head">
-        <span class="section-num">05</span>
+        <span class="section-num">06</span>
         <h2 class="section-title">What you're becoming</h2>
       </div>
       <div class="becoming-card">
@@ -670,7 +701,7 @@
 
     {% if question %}
     <section class="question-block">
-      <div class="question-label">06 · One question</div>
+      <div class="question-label">07 · One question</div>
       <p class="question">{{ question | safe }}</p>
       {% if question_note %}<p class="question-note">{{ question_note }}</p>{% endif %}
     </section>
@@ -679,7 +710,7 @@
     <div class="note-close">
       <div class="signoff">
         <div class="signoff-line">{{ closing_line }}</div>
-        <div class="sig-name">Claude</div>
+        <div class="sig-name">{{ signoff }}</div>
       </div>
       <div class="close-mark">× × ×</div>
     </div>

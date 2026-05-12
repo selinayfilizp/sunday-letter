@@ -1056,6 +1056,7 @@
   <div class="wordmark"><span class="dot"></span>The Sunday Letter</div>
   <nav>
     <a href="#philosophy" onclick="switchTab('philosophy'); return false;">Philosophy</a>
+    <a href="codex.html">Codex</a>
     <a href="https://github.com/selinayfilizp/sunday-letter" target="_blank" rel="noopener">GitHub</a>
     <a class="install-pill" href="#install" onclick="switchTab('install'); return false;">Install</a>
   </nav>
@@ -1373,7 +1374,7 @@
     <!-- INSTALL panel -->
     <div class="panel-single install-panel" data-panel="install">
       <h2>Add it to your agent.</h2>
-      <p class="lede">Three ways to install. Pick the one that matches your setup. Everything ships the same skill and the same six rules, the only difference is where it lives.</p>
+      <p class="lede">Four ways to install. Pick the one that matches your setup. Everything ships the same contract and renderer; Codex adds a local seven-day history collector.</p>
 
       <div class="install-split">
 
@@ -1396,12 +1397,20 @@
               <div class="install-code-block">/plugin install sunday-letter</div>
             </div>
 
+            <div class="install-option">
+              <div class="install-option-label">For Codex Desktop users</div>
+              <h3>Use the Codex bundle</h3>
+              <p>Imports as a Codex plugin and includes a collector that reads local Codex conversations from the last seven days before writing the letter.</p>
+              <a class="install-cta" href="sunday-letter-codex.plugin" download>Download Codex plugin →</a>
+            </div>
+
             <div class="install-option install-option-wide">
               <div class="install-option-label">For any other AI agent</div>
               <h3>Bring your own LLM</h3>
               <p>The Sunday Letter is a contract, not a runtime. It works with ChatGPT, Cursor, Gemini, Claude in the API, or any agent that can read JSON and write HTML. Drop the system prompt into your agent's instructions, hand it the signal schema, and run the template through Jinja or the equivalent.</p>
               <div class="install-cta-row">
                 <a class="install-cta" href="sunday-letter.plugin" download>↓ Download the bundle</a>
+                <a class="ghost-link" href="codex.html">Read Codex collector docs <span class="arrow">→</span></a>
                 <a class="ghost-link" href="https://github.com/selinayfilizp/sunday-letter" target="_blank" rel="noopener">View raw template, schema, and prompt <span class="arrow">→</span></a>
               </div>
               <ul class="byo-list">

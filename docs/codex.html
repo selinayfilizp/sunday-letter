@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Codex · The Sunday Letter</title>
+<meta name="description" content="Run the Sunday Letter in Codex with a local seven-day conversation collector, weekly automation, and shared renderer.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #EEEAE0;
+    --paper-active: #F5F1E6;
+    --paper-edge: #D8D3C3;
+    --paper-2: #E7E2D3;
+    --sky: #DBE0E8;
+    --ink: #1A1A1A;
+    --ink-2: #3A3A38;
+    --ink-muted: #6B6B6B;
+    --ink-soft: #8E8C87;
+    --firm: #1A4C2E;
+    --rule: rgba(26, 26, 26, 0.12);
+    --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, 'Menlo', monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: linear-gradient(180deg, var(--sky) 0%, var(--paper) 220px, var(--paper) 100%);
+    font-family: var(--font-ui);
+    color: var(--ink);
+    line-height: 1.55;
+  }
+  .topbar {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 22px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .wordmark, .topbar a {
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .wordmark {
+    font-weight: 700;
+    font-size: 14px;
+  }
+  .wordmark .dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    background: var(--firm);
+    border-radius: 50%;
+    margin-right: 8px;
+  }
+  nav {
+    display: flex;
+    gap: 22px;
+    font-size: 13px;
+  }
+  main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 34px 40px 88px;
+  }
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--firm);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+  h1 {
+    font-size: 48px;
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    margin: 0 0 16px;
+    max-width: 14ch;
+  }
+  .lede {
+    font-size: 18px;
+    color: var(--ink-2);
+    max-width: 62ch;
+    margin: 0 0 34px;
+  }
+  .card {
+    background: var(--paper-active);
+    border: 1px solid var(--paper-edge);
+    border-radius: 10px;
+    padding: 28px 32px;
+    margin: 22px 0;
+    box-shadow: 0 8px 26px rgba(26, 26, 26, 0.08);
+  }
+  .card h2 {
+    font-size: 21px;
+    letter-spacing: -0.015em;
+    margin: 0 0 8px;
+  }
+  .card p {
+    margin: 0 0 16px;
+    color: var(--ink-2);
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
+  .mini {
+    background: var(--paper-2);
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    padding: 18px;
+  }
+  .mini strong {
+    display: block;
+    margin-bottom: 6px;
+  }
+  .mini span {
+    color: var(--ink-muted);
+    font-size: 14px;
+  }
+  code, pre {
+    font-family: var(--font-mono);
+  }
+  pre {
+    background: var(--ink);
+    color: #EEEAE0;
+    border-radius: 8px;
+    padding: 16px;
+    overflow-x: auto;
+    font-size: 12px;
+    line-height: 1.6;
+  }
+  .pill {
+    display: inline-flex;
+    background: var(--ink);
+    color: var(--paper-active);
+    text-decoration: none;
+    border-radius: 4px;
+    padding: 10px 15px;
+    font-weight: 600;
+    font-size: 13px;
+  }
+  ol {
+    padding-left: 20px;
+    color: var(--ink-2);
+  }
+  li { margin: 8px 0; }
+  .note {
+    font-size: 13px;
+    color: var(--ink-muted);
+    border-top: 1px solid var(--rule);
+    margin-top: 24px;
+    padding-top: 18px;
+  }
+  @media (max-width: 720px) {
+    .topbar, main { padding-left: 18px; padding-right: 18px; }
+    h1 { font-size: 36px; }
+    .grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <a class="wordmark" href="index.html"><span class="dot"></span>The Sunday Letter</a>
+  <nav>
+    <a href="index.html">Sample</a>
+    <a href="subscribe.html">Install</a>
+    <a href="https://github.com/selinayfilizp/sunday-letter">GitHub</a>
+  </nav>
+</header>
+
+<main>
+  <div class="eyebrow">Codex Desktop · local context collector</div>
+  <h1>Make the letter read the actual week.</h1>
+  <p class="lede">In Codex, the Sunday Letter is not just a prompt. It has a local collector that reads the last seven days of Codex Desktop threads, extracts decisions and open loops, then renders the same Archive-style letter used by Claude/Cowork.</p>
+
+  <section class="card">
+    <h2>The architecture</h2>
+    <div class="grid">
+      <div class="mini">
+        <strong>Shared contract</strong>
+        <span>One schema for consequences, decisions, open tasks, observations, retired beliefs, and the weekly question.</span>
+      </div>
+      <div class="mini">
+        <strong>Host-specific collectors</strong>
+        <span>Codex reads local rollout files. Claude/Cowork uses its own conversation history or an exported transcript bundle.</span>
+      </div>
+      <div class="mini">
+        <strong>One renderer</strong>
+        <span>The generated JSON renders through the same self-contained HTML template.</span>
+      </div>
+      <div class="mini">
+        <strong>Default silence</strong>
+        <span>If nothing meaningful changed, the job skips instead of inventing a weekly note.</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Install in Codex</h2>
+    <p>Import the Codex-compatible bundle, or add the repo as a local plugin source.</p>
+    <p><a class="pill" href="sunday-letter-codex.plugin" download>Download sunday-letter-codex.plugin</a></p>
+    <pre>python3 skills/sunday-letter/scripts/collect_codex_context.py \
+  --days 7 \
+  --out letters/codex-weekly-context.md \
+  --limit 80 \
+  --per-message-limit 3000</pre>
+    <p class="note">The collector reads local Codex state under <code>~/.codex</code>. It does not upload transcripts anywhere.</p>
+  </section>
+
+  <section class="card">
+    <h2>What the weekly automation should do</h2>
+    <ol>
+      <li>Run the Codex collector for the last seven days.</li>
+      <li>Read the generated context bundle.</li>
+      <li>Extract weekly signals into the Sunday Letter schema.</li>
+      <li>Carry forward decisions and open tasks as first-class objects.</li>
+      <li>Render the letter with <code>generate_letter.py</code>.</li>
+      <li>Skip if there is no meaningful delta.</li>
+    </ol>
+  </section>
+
+  <section class="card">
+    <h2>Claude/Cowork compatibility</h2>
+    <p>The letter contract is portable. The collector is not. For Claude/Cowork, use the host's conversation-history tool or export a transcript bundle into the same shape Codex produces. The renderer and schema stay the same.</p>
+    <pre>collector output -> weekly context markdown
+weekly context -> signals JSON
+signals JSON -> Archive HTML letter</pre>
+  </section>
+</main>
+</body>
+</html>

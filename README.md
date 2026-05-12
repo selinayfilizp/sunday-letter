@@ -23,6 +23,24 @@ Every letter obeys six rules:
 
 Download `docs/sunday-letter.plugin` and drop it into Cowork.
 
+### Codex Desktop
+
+Download `docs/sunday-letter-codex.plugin` and import it as a local Codex plugin, or point Codex at this repo as a local plugin source. The Codex version includes:
+
+- `.codex-plugin/plugin.json`, the Codex plugin manifest.
+- `skills/sunday-letter/scripts/collect_codex_context.py`, a local seven-day Codex history collector.
+- The same Sunday Letter schema and renderer used by the Claude/Cowork version.
+
+Run the collector directly:
+
+```bash
+python3 skills/sunday-letter/scripts/collect_codex_context.py \
+  --days 7 \
+  --out letters/codex-weekly-context.md
+```
+
+The collector reads local Codex Desktop state under `~/.codex` and writes a Markdown transcript bundle. It does not upload transcripts anywhere.
+
 ### Claude Code
 
 ```bash
@@ -54,10 +72,12 @@ Open `my-letter.html` in a browser. That's it.
 ```
 .
 ├── .claude-plugin/plugin.json     plugin manifest
+├── .codex-plugin/plugin.json      Codex plugin manifest
 ├── commands/                      slash commands (/sunday-letter, /subscribe-sunday-letter)
 ├── skills/sunday-letter/
 │   ├── SKILL.md                   the agent's instructions
 │   ├── scripts/generate_letter.py the renderer
+│   ├── scripts/collect_codex_context.py Codex seven-day history collector
 │   └── references/
 │       ├── template.html          the Archive design template
 │       ├── system-prompt.md       portable agent prompt for any LLM
@@ -65,7 +85,7 @@ Open `my-letter.html` in a browser. That's it.
 │       ├── design-principles.md   the design contract
 │       ├── example-signals.json   complete worked example (Teddy, cheesemonger)
 │       └── schedule-config.example.json  weekly slot (day, time, tz, cron)
-├── docs/                          static site (landing page, sample letter, install page)
+├── docs/                          static site (landing page, sample letter, install/Codex pages)
 ├── generate_letter.py             top-level renderer for direct Python use
 ├── template.html                  top-level template
 └── week_signals.example.json      example weekly signals
