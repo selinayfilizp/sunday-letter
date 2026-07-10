@@ -19,33 +19,49 @@ Every letter obeys six rules:
 
 ## Install
 
+### Claude Code (plugin, recommended)
+
+Inside Claude Code:
+
+```
+/plugin marketplace add selinayfilizp/sunday-letter
+/plugin install sunday-letter@sunday-letter
+```
+
+Then run `/sunday-letter` for a letter now, or `/subscribe-sunday-letter` to pick your weekly slot.
+
+### Claude Code or Codex CLI (one script)
+
+```bash
+git clone https://github.com/selinayfilizp/sunday-letter.git
+cd sunday-letter
+./install.sh          # installs for every agent it finds
+./install.sh claude   # or just Claude Code
+./install.sh codex    # or just Codex
+```
+
+The script copies the skill into `~/.claude/skills/` and/or `~/.codex/skills/`, and the slash commands into `~/.claude/commands/` and/or `~/.codex/prompts/`. Everything stays local.
+
+### Codex (manual)
+
+Codex reads Agent Skills from `~/.codex/skills/` (personal) or `.codex/skills/` (project). The SKILL.md format is portable, so copying is the whole install:
+
+```bash
+mkdir -p ~/.codex/skills
+cp -R skills/sunday-letter ~/.codex/skills/
+```
+
+The skill's Codex path uses `scripts/collect_codex_context.py`, a local seven-day history collector. It reads Codex state under `~/.codex` and writes a Markdown transcript bundle; it does not upload transcripts anywhere. Run it directly if you want to see what the letter sees:
+
+```bash
+python3 skills/sunday-letter/scripts/collect_codex_context.py --days 7 --out codex-weekly-context.md
+```
+
+Claude Code has the same thing in `scripts/collect_claude_context.py`, reading `~/.claude/projects`.
+
 ### Cowork (Claude desktop)
 
-Download `docs/sunday-letter.plugin` and drop it into Cowork.
-
-### Codex Desktop
-
-Download `docs/sunday-letter-codex.plugin` and import it as a local Codex plugin, or point Codex at this repo as a local plugin source. The Codex version includes:
-
-- `.codex-plugin/plugin.json`, the Codex plugin manifest.
-- `skills/sunday-letter/scripts/collect_codex_context.py`, a local seven-day Codex history collector.
-- The same Sunday Letter schema and renderer used by the Claude/Cowork version.
-
-Run the collector directly:
-
-```bash
-python3 skills/sunday-letter/scripts/collect_codex_context.py \
-  --days 7 \
-  --out letters/codex-weekly-context.md
-```
-
-The collector reads local Codex Desktop state under `~/.codex` and writes a Markdown transcript bundle. It does not upload transcripts anywhere.
-
-### Claude Code
-
-```bash
-/plugin install sunday-letter
-```
+Download `docs/sunday-letter.plugin` and drop it into Cowork. Codex Desktop users can try `docs/sunday-letter-codex.plugin` the same way.
 
 ### Any other AI agent (ChatGPT, Cursor, Gemini, Claude API, etc.)
 
@@ -54,6 +70,24 @@ The Sunday Letter is a contract, not a runtime. To use it with any agent:
 1. Drop `skills/sunday-letter/references/system-prompt.md` into your agent's instructions.
 2. Hand the agent `skills/sunday-letter/references/schema.md` so it knows the JSON shape.
 3. Render the JSON output through `template.html` with any Jinja-compatible engine.
+
+## Make it a weekly routine
+
+Two ways, pick one:
+
+**Inside the agent.** Run `/subscribe-sunday-letter` and pick a day, time, and optional timezone. On hosts with a native scheduler the command creates the recurring task for you.
+
+**Plain cron (works anywhere).** Add one line with `crontab -e` (Sunday 6 PM shown, adjust the last two fields for your slot):
+
+```cron
+# Claude Code
+0 18 * * 0 claude -p "/sunday-letter" >> ~/sunday-letter/cron.log 2>&1
+
+# Codex CLI
+0 18 * * 0 codex exec "Use the sunday-letter skill and write this week's letter. Stay silent if nothing meaningful changed." >> ~/sunday-letter/cron.log 2>&1
+```
+
+Either way, letters land in `~/sunday-letter/letters/` and the running ledger (letter number, preferences, retired beliefs) lives at `~/sunday-letter/ledger.json`. Silent weeks are recorded in the ledger but ship nothing.
 
 ## Run from Python
 
@@ -72,11 +106,14 @@ Open `my-letter.html` in a browser. That's it.
 ```
 .
 ├── .claude-plugin/plugin.json     plugin manifest
+├── .claude-plugin/marketplace.json  marketplace registry (enables /plugin marketplace add)
 ├── .codex-plugin/plugin.json      Codex plugin manifest
+├── install.sh                     one-command install for Claude Code and Codex CLI
 ├── commands/                      slash commands (/sunday-letter, /subscribe-sunday-letter)
 ├── skills/sunday-letter/
 │   ├── SKILL.md                   the agent's instructions
 │   ├── scripts/generate_letter.py the renderer
+│   ├── scripts/collect_claude_context.py Claude Code seven-day history collector
 │   ├── scripts/collect_codex_context.py Codex seven-day history collector
 │   └── references/
 │       ├── template.html          the Archive design template

@@ -1392,16 +1392,16 @@
 
             <div class="install-option">
               <div class="install-option-label">For Claude Code users</div>
-              <h3>One install command</h3>
-              <p>Installs into your Claude Code session globally. Works with both <code>claude</code> interactive mode and scripted workflows.</p>
-              <div class="install-code-block">/plugin install sunday-letter</div>
+              <h3>Two install commands</h3>
+              <p>Add the repo as a plugin marketplace, then install. Works with both <code>claude</code> interactive mode and scripted workflows.</p>
+              <div class="install-code-block">/plugin marketplace add selinayfilizp/sunday-letter<br>/plugin install sunday-letter@sunday-letter</div>
             </div>
 
             <div class="install-option">
-              <div class="install-option-label">For Codex Desktop users</div>
-              <h3>Use the Codex bundle</h3>
-              <p>Imports as a Codex plugin and includes a collector that reads local Codex conversations from the last seven days before writing the letter.</p>
-              <a class="install-cta" href="sunday-letter-codex.plugin" download>Download Codex plugin →</a>
+              <div class="install-option-label">For Codex users</div>
+              <h3>Copy the skill in</h3>
+              <p>Codex reads Agent Skills from <code>~/.codex/skills/</code>. Clone the repo and run <code>./install.sh codex</code>, or copy <code>skills/sunday-letter</code> in by hand. A local collector reads the last seven days of Codex conversations before writing the letter.</p>
+              <a class="install-cta" href="sunday-letter-codex.plugin" download>Or download the Codex bundle →</a>
             </div>
 
             <div class="install-option install-option-wide">

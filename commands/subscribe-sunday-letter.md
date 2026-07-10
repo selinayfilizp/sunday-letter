@@ -44,6 +44,13 @@ Set up the Sunday Letter as a recurring weekly task. The **name stays "Sunday Le
 
    - If the platform supports **timezone** on the task and they gave an IANA zone, set it. Otherwise add one line to the task description or their notes: `Wall clock: ${timezone or "scheduler local"}.`
 
+   **If the host has no scheduler** (plain Claude Code CLI or Codex CLI without scheduled tasks): offer to add a crontab line instead. Show it, get their ok, then append it via `crontab`:
+
+   - Claude Code: `${cron} claude -p "/sunday-letter" >> ~/sunday-letter/cron.log 2>&1`
+   - Codex CLI: `${cron} codex exec "Use the sunday-letter skill and write this week's letter. Stay silent if nothing meaningful changed." >> ~/sunday-letter/cron.log 2>&1`
+
+   Remind them cron fires on the machine's local clock and only while the machine is awake.
+
 5. **Walk through what they signed up for.** One short paragraph:
    - Default is silence; a letter only ships when something meaningful changed.
    - They can **change day or time** anytime by running this command again or asking you to reschedule.

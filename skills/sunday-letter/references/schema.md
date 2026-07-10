@@ -2,7 +2,7 @@
 
 One JSON object per letter. This is the contract between the model (which extracts signals from a week of conversations) and the template (which renders them as a letter).
 
-See [`week_signals.example.json`](./week_signals.example.json) for a complete, working example.
+See [`example-signals.json`](./example-signals.json) for a complete, working example.
 
 ## Top-level fields
 

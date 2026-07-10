@@ -1,6 +1,6 @@
 {
   "name": "sunday-letter",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A weekly letter from your agent at a day and time you configure (Sunday 6pm is the default). It reports what it did for you, what it learned, what it stopped believing, and one question worth sitting with.",
   "author": {
     "name": "The Sunday Letter"

@@ -32,7 +32,17 @@ Read `references/design-principles.md` for the reasoning behind these rules and 
 
 Look back over the user's last 7 days of conversations with you. This must use real conversation history, not just the current thread, whenever the host makes history available.
 
-**In Codex Desktop:** run the local collector before extracting signals:
+Also read the ledger at `~/sunday-letter/ledger.json` if it exists. It carries the letter number, the running preference list, and previously retired beliefs from week to week. If there is no ledger yet, this is letter number 1.
+
+**In Claude Code:** run the local collector before extracting signals:
+
+```bash
+python3 scripts/collect_claude_context.py --days 7 --out claude-weekly-context.md
+```
+
+Then read `claude-weekly-context.md` and treat it as the source transcript bundle for the week. The collector reads local session transcripts under `~/.claude/projects`; it does not call a network service.
+
+**In Codex (CLI or Desktop):** run the local collector before extracting signals:
 
 ```bash
 python3 scripts/collect_codex_context.py --days 7 --out codex-weekly-context.md
@@ -40,7 +50,7 @@ python3 scripts/collect_codex_context.py --days 7 --out codex-weekly-context.md
 
 Then read `codex-weekly-context.md` and treat it as the source transcript bundle for the week. The collector reads the user's local Codex thread database and rollout JSONL files from `~/.codex`; it does not call a network service.
 
-**In Claude/Cowork:** use the available conversation history or scheduled-task context tool. If the host does not expose a history API, say that clearly and do not pretend to have seven days of context.
+**In Cowork or any other host:** use the available conversation history or scheduled-task context tool. If the host does not expose a history API, say that clearly and do not pretend to have seven days of context.
 
 You need enough material to answer:
 
@@ -87,9 +97,31 @@ The renderer has a dependency-free fallback in Codex, so `jinja2` is optional fo
 
 ### Step 5, Deliver
 
-Save the HTML to the user's outputs folder and share a `computer://` link. Keep the accompanying message short: one sentence about whether anything interesting shifted this week, then the link. Let the letter speak for itself.
+Save the letter to the archive: `~/sunday-letter/letters/YYYY-MM-DD-letter-NN.html` (date and letter number). Then point the user at it in whatever way the host supports:
+
+- **Cowork:** also copy it to the user's outputs folder and share a `computer://` link.
+- **Claude Code / Codex CLI:** share the file path, and offer to open it in the browser (`open <path>` on macOS, `xdg-open <path>` on Linux).
+
+Keep the accompanying message short: one sentence about whether anything interesting shifted this week, then the link or path. Let the letter speak for itself.
 
 If the user has a delivery channel configured (email, iMessage, voice), note that channel routing is not yet wired, the rendered HTML is the artifact; delivery is their own pipeline.
+
+### Step 6, Update the ledger
+
+Whether you shipped or skipped, write `~/sunday-letter/ledger.json` so next week starts from the truth of this one:
+
+```json
+{
+  "letter_number": 12,
+  "last_run": "2026-07-12",
+  "last_shipped": "2026-07-12",
+  "preferences": [{"label": "...", "value": "...", "provenance": "..."}],
+  "retired": [{"old_belief": "...", "why": "...", "retired_on": "2026-07-12"}],
+  "open_question": "the question you asked, so you can follow up on it next week"
+}
+```
+
+Increment `letter_number` only when a letter actually ships. The ledger is what makes retirements honest: you can only cross out a belief you can show you previously held.
 
 ## Critical style notes
 

@@ -462,10 +462,14 @@
       <span class="install-num">C</span>
       <div>
         <h3 class="install-title">Claude Code (CLI)</h3>
-        <p class="install-body">Run this in your terminal to install from the marketplace.</p>
+        <p class="install-body">Inside Claude Code, add the repo as a marketplace, then install.</p>
         <div class="code">
-          <span><span class="prompt">$</span>claude plugin install sunday-letter</span>
-          <button onclick="navigator.clipboard.writeText('claude plugin install sunday-letter');this.textContent='Copied'">Copy</button>
+          <span><span class="prompt">&gt;</span>/plugin marketplace add selinayfilizp/sunday-letter</span>
+          <button onclick="navigator.clipboard.writeText('/plugin marketplace add selinayfilizp/sunday-letter');this.textContent='Copied'">Copy</button>
+        </div>
+        <div class="code" style="margin-top:8px;">
+          <span><span class="prompt">&gt;</span>/plugin install sunday-letter@sunday-letter</span>
+          <button onclick="navigator.clipboard.writeText('/plugin install sunday-letter@sunday-letter');this.textContent='Copied'">Copy</button>
         </div>
       </div>
     </div>
