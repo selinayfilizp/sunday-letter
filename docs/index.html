@@ -8,29 +8,29 @@
   <title>The Sunday Letter · Local Codex reflection</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Homemade+Apple&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Libre+Caslon+Display&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Homemade+Apple&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Manrope:wght@700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --paper:#eeeae0; --paper-2:#e5e0d2; --card:#f8f5ec; --ink:#1a1a1a;
+      --paper:#f7f4ec; --paper-2:#efece1; --card:#fdfbf5; --ink:#1a1a1a;
       --ink-2:#3a3a38; --muted:#6b6b6b; --faint:#9b978d; --green:#1a4c2e;
       --rule:rgba(26,26,26,.12); --shadow:0 24px 70px rgba(26,26,26,.12);
       --ui:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
       --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
-      --serif:"Libre Caslon Display",Georgia,serif; --hand:"Homemade Apple",cursive;
+      --serif:"Manrope",Inter,-apple-system,sans-serif; --hand:"Homemade Apple",cursive;
     }
-    *{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;background:linear-gradient(#dbe0e8 0,#eeeae0 390px);color:var(--ink);font-family:var(--ui);overflow-x:hidden} em,i{font-style:normal}
+    *{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;background:linear-gradient(#fbf9f2 0,#f7f4ec 390px);color:var(--ink);font-family:var(--ui);overflow-x:hidden} em,i{font-style:normal}
     body::after{content:"";position:fixed;inset:0;z-index:1000;pointer-events:none;opacity:.38;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .025 0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E")}
     a{color:inherit}.topbar{width:min(1180px,calc(100% - 40px));margin:auto;padding:22px 0;display:flex;align-items:center;justify-content:space-between;gap:20px}
     .wordmark{font-weight:700;text-decoration:none;white-space:nowrap}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:8px}
     nav{display:flex;align-items:center;gap:24px;font-size:13px}nav a{text-decoration:none;color:var(--ink-2)}.pill{display:inline-block;background:var(--ink);color:white!important;border-radius:6px;padding:10px 14px;text-decoration:none;font-weight:600}
     .hero{position:relative;width:min(1180px,calc(100% - 40px));margin:70px auto 76px;isolation:isolate}.hero>*:not(.hero-orbit){position:relative;z-index:2}.eyebrow,.kicker{font:500 11px/1.5 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
-    h1{max-width:940px;margin:14px 0 20px;font:400 clamp(52px,8.5vw,104px)/.94 var(--serif);letter-spacing:-.018em}.hero p{max-width:700px;margin:0;color:var(--ink-2);font-size:20px;line-height:1.6}
+    h1{max-width:940px;margin:14px 0 20px;font:800 clamp(46px,7.2vw,90px)/1.0 var(--serif);letter-spacing:-.035em}.hero p{max-width:700px;margin:0;color:var(--ink-2);font-size:20px;line-height:1.6}
     .badges{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}.badge{border:1px solid var(--rule);border-radius:999px;padding:7px 10px;font:500 11px/1 var(--mono);color:var(--green);background:rgba(255,255,255,.25)}
     .hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}.secondary{display:inline-block;border-bottom:1px solid var(--ink);padding:10px 2px 6px;text-decoration:none;font-weight:600;font-size:14px}
     .section{width:min(1180px,calc(100% - 40px));margin:0 auto;padding:88px 0;border-top:1px solid var(--rule)}.section-head{display:grid;grid-template-columns:180px minmax(0,680px);gap:28px;margin-bottom:44px}
-    h2{margin:0;font:400 clamp(36px,5.5vw,64px)/1.02 var(--serif);letter-spacing:-.015em}.section-head p{margin:12px 0 0;color:var(--muted);font-size:17px;line-height:1.6}
+    h2{margin:0;font:800 clamp(32px,4.6vw,54px)/1.04 var(--serif);letter-spacing:-.03em}.section-head p{margin:12px 0 0;color:var(--muted);font-size:17px;line-height:1.6}
     .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.step,.trust-card,.install-card{background:rgba(248,245,236,.72);border:1px solid var(--rule);border-radius:10px;padding:25px}
-    .num{font:600 11px/1 var(--mono);color:var(--green);letter-spacing:.1em}.step h3,.trust-card h3,.install-card h3{margin:28px 0 8px;font:400 25px/1.1 var(--serif)}.step p,.trust-card p,.install-card p{margin:0;color:var(--muted);line-height:1.55}
+    .num{font:600 11px/1 var(--mono);color:var(--green);letter-spacing:.1em}.step h3,.trust-card h3,.install-card h3{margin:28px 0 8px;font:800 20px/1.2 var(--serif);letter-spacing:-.015em}.step p,.trust-card p,.install-card p{margin:0;color:var(--muted);line-height:1.55}
     .sample{background:var(--card);border:1px solid var(--rule);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}.sample-bar{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:16px 20px;background:var(--paper-2);border-bottom:1px solid var(--rule);font:500 11px/1 var(--mono);text-transform:uppercase;letter-spacing:.08em}.sample iframe{display:block;width:100%;height:720px;border:0;background:var(--paper)}
     .trust-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.trust-card h3{margin-top:0}.trust-card strong{color:var(--ink)}
     .install-grid{display:grid;grid-template-columns:1.4fr .8fr;gap:14px}.install-card h3{margin-top:0}.code{margin:18px 0;padding:18px;border-radius:7px;background:#1a1a1a;color:#e9e5da;overflow:auto;font:12px/1.7 var(--mono);white-space:pre}.install-card ul{margin:18px 0 0;padding-left:20px;color:var(--muted);line-height:1.7}
@@ -64,8 +64,8 @@
     <section class="hero">
       <div class="hero-orbit" aria-hidden="true"><div class="vortex-tilt"><div class="vortex-ring" id="hero-ring"></div></div></div>
       <div class="eyebrow">A local Codex experiment · v0.3.0</div>
-      <h1>A weekly note about what actually changed.</h1>
-      <p>The Sunday Letter turns selected, dated Codex conversations into a restrained private letter: what the agent completed, what it learned, what it stopped believing, and one question. If the week has no meaningful delta, it writes nothing.</p>
+      <h1>A weekly letter from your AI, about you.</h1>
+      <p>Your dated Codex conversations become a short private letter: what your agent completed, what it learned, what it stopped believing, and one question. If nothing meaningful changed, it writes nothing.</p>
       <div class="badges">
         <span class="badge">Local Codex sources only</span>
         <span class="badge">Per-message date window</span>
@@ -81,7 +81,7 @@
     <section class="section" id="how">
       <div class="section-head">
         <div class="kicker">The actual pipeline</div>
-        <div><h2>Collection first. Claims second.</h2><p>The implementation and the promise now share one path. Each stage must succeed before the next can run.</p></div>
+        <div><h2>Collection first, claims second.</h2><p>The implementation and the promise now share one path. Each stage must succeed before the next can run.</p></div>
       </div>
       <div class="steps">
         <article class="step"><div class="num">01</div><h3>Collect and scope</h3><p>Read dated messages from local Codex state. Include all recent threads or narrow to exact working directories and thread IDs. Redact common credential shapes before writing the bundle.</p></article>
