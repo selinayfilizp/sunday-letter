@@ -25,6 +25,11 @@ INCLUDE = (
 )
 
 
+# The Codex bundle ships the Codex reference path only. Claude Code users
+# install from the repository (install.sh claude) or the plugin marketplace.
+EXCLUDE_NAMES = frozenset({"collect_claude_context.py"})
+
+
 def _files() -> list[Path]:
     files: list[Path] = []
     for relative in INCLUDE:
@@ -39,6 +44,7 @@ def _files() -> list[Path]:
                 and "__pycache__" not in candidate.parts
                 and candidate.suffix != ".pyc"
                 and candidate.name != ".DS_Store"
+                and candidate.name not in EXCLUDE_NAMES
             )
     return sorted(files, key=lambda path: path.relative_to(ROOT).as_posix())
 

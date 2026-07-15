@@ -34,8 +34,8 @@ class ReleaseTests(unittest.TestCase):
 
     def test_manifest_and_public_version_match(self) -> None:
         manifest = json.loads((ROOT / ".codex-plugin" / "plugin.json").read_text())
-        self.assertEqual(manifest["version"], "0.3.0")
-        self.assertIn("v0.3.0", (ROOT / "docs" / "index.html").read_text())
+        self.assertEqual(manifest["version"], "0.4.0")
+        self.assertIn("v0.4.0", (ROOT / "docs" / "index.html").read_text())
 
 
 if __name__ == "__main__":

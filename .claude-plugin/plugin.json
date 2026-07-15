@@ -1,0 +1,17 @@
+{
+  "name": "sunday-letter",
+  "version": "0.4.0",
+  "description": "A private local weekly letter grounded in dated, selected Codex or Claude Code conversations. It reports what your agent completed, what it learned, what it stopped believing, and one question worth sitting with.",
+  "author": {
+    "name": "The Sunday Letter"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/selinayfilizp/sunday-letter",
+  "keywords": [
+    "preference-learning",
+    "weekly-digest",
+    "reflection",
+    "personal-agent",
+    "sunday"
+  ]
+}

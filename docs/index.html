@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="A private local weekly letter grounded in dated Codex conversations. It writes only when something meaningful changed.">
+  <meta name="description" content="A private local weekly letter grounded in dated Codex or Claude Code conversations. It writes only when something meaningful changed.">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='%23315c45'/%3E%3C/svg%3E">
-  <title>The Sunday Letter · Local Codex reflection</title>
+  <title>The Sunday Letter · A local weekly reflection</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Homemade+Apple&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Manrope:wght@700;800&display=swap" rel="stylesheet">
@@ -56,18 +56,18 @@
       <a href="#how">How it works</a>
       <a href="#trust">Privacy</a>
       <a href="https://github.com/selinayfilizp/sunday-letter">GitHub</a>
-      <a class="pill" href="#install">Install for Codex</a>
+      <a class="pill" href="#install">Install</a>
     </nav>
   </header>
 
   <main id="top">
     <section class="hero">
       <div class="hero-orbit" aria-hidden="true"><div class="vortex-tilt"><div class="vortex-ring" id="hero-ring"></div></div></div>
-      <div class="eyebrow">A local Codex experiment · v0.3.0</div>
+      <div class="eyebrow">A local agent experiment · v0.4.0</div>
       <h1>A weekly letter from your AI, about you.</h1>
-      <p>Your dated Codex conversations become a short private letter: what your agent completed, what it learned, what it stopped believing, and one question. If nothing meaningful changed, it writes nothing.</p>
+      <p>Your dated Codex or Claude Code conversations become a short private letter: what your agent completed, what it learned, what it stopped believing, and one question. If nothing meaningful changed, it writes nothing.</p>
       <div class="badges">
-        <span class="badge">Local Codex sources only</span>
+        <span class="badge">Local sources only</span>
         <span class="badge">Per-message date window</span>
         <span class="badge">Default silence</span>
         <span class="badge">No fabricated metrics</span>
@@ -84,7 +84,7 @@
         <div><h2>Collection first, claims second.</h2><p>The implementation and the promise now share one path. Each stage must succeed before the next can run.</p></div>
       </div>
       <div class="steps">
-        <article class="step"><div class="num">01</div><h3>Collect and scope</h3><p>Read dated messages from local Codex state. Include all recent threads or narrow to exact working directories and thread IDs. Redact common credential shapes before writing the bundle.</p></article>
+        <article class="step"><div class="num">01</div><h3>Collect and scope</h3><p>Read dated messages from local Codex or Claude Code state. Include all recent conversations or narrow to exact working directories and thread or session IDs. Redact common credential shapes before writing the bundle.</p></article>
         <article class="step"><div class="num">02</div><h3>Validate and gate</h3><p>Extract one canonical JSON shape. Verify its scope, counts, and date window against the collector header. Reject unmeasured metrics and untraceable claims. A skip payload can never reach the renderer.</p></article>
         <article class="step"><div class="num">03</div><h3>Render and archive</h3><p>Sanitize rich text, write the letter and signals record, atomically update the ledger, and rebuild the private local archive.</p></article>
       </div>
@@ -107,17 +107,17 @@
         <div><h2>Local does not mean invisible.</h2><p>The collector's scope, the retained artifacts, and the limits of deletion are stated explicitly.</p></div>
       </div>
       <div class="trust-grid">
-        <article class="trust-card"><h3>What it reads</h3><p>Dated user messages and final assistant answers already stored in local Codex conversation history. It does <strong>not</strong> independently scan arbitrary personal files.</p></article>
-        <article class="trust-card"><h3>How scope works</h3><p>The default is all dated Codex threads in the selected window. Use <code>--cwd</code> or <code>--thread-id</code> to choose a smaller source set. Undated messages are excluded by default.</p></article>
+        <article class="trust-card"><h3>What it reads</h3><p>Dated user messages and final assistant answers already stored in local Codex or Claude Code conversation history. It does <strong>not</strong> independently scan arbitrary personal files.</p></article>
+        <article class="trust-card"><h3>How scope works</h3><p>The default is all dated conversations in the selected window. Use <code>--cwd</code>, <code>--thread-id</code> (Codex), or <code>--session-id</code> (Claude Code) to choose a smaller source set. Undated messages are excluded by default.</p></article>
         <article class="trust-card"><h3>What is retained</h3><p>Shipped HTML, its validated signals record, an atomic ledger, and archive metadata under <code>~/sunday-letter/</code>. Temporary transcript bundles are removed after each run.</p></article>
-        <article class="trust-card"><h3>What deletion means</h3><p>Delete removes Sunday Letter artifacts. It does not erase the underlying Codex conversations or unrelated Codex memory. Those remain controlled by Codex.</p></article>
+        <article class="trust-card"><h3>What deletion means</h3><p>Delete removes Sunday Letter artifacts. It does not erase the underlying agent conversations or unrelated agent memory. Those remain controlled by Codex or Claude Code.</p></article>
       </div>
     </section>
 
     <section class="section" id="install">
       <div class="section-head">
         <div class="kicker">Install</div>
-        <div><h2>One supported path.</h2><p>Version 0.3.0 is intentionally Codex-local. Portability and delivery integrations come after this path is dependable.</p></div>
+        <div><h2>Two supported paths, one pipeline.</h2><p>Version 0.4.0 runs locally for Codex and Claude Code through the same validated pipeline. Delivery integrations come after these paths are dependable.</p></div>
       </div>
       <div class="install-grid">
         <article class="install-card">
@@ -125,21 +125,24 @@
           <div class="code">git clone https://github.com/selinayfilizp/sunday-letter.git
 cd sunday-letter
 ./install.sh</div>
-          <p>Start a new Codex session, then run <code>/sunday-letter</code> for a one-time letter or <code>/subscribe-sunday-letter</code> to configure a weekly invocation.</p>
+          <p>Installs into every agent home it finds (Codex and Claude Code). Start a new session, then run <code>/sunday-letter</code> for a one-time letter or <code>/subscribe-sunday-letter</code> to configure a weekly invocation.</p>
+          <p style="margin-top:14px">Claude Code users can install from the plugin marketplace instead:</p>
+          <div class="code">/plugin marketplace add selinayfilizp/sunday-letter
+/plugin install sunday-letter@sunday-letter</div>
         </article>
         <article class="install-card">
           <h3>Codex bundle</h3>
-          <p>Prefer a local import? Download the deterministic bundle built from the same tested source.</p>
-          <p style="margin-top:20px"><a class="pill" href="sunday-letter-codex.plugin" download>Download v0.3.0</a></p>
+          <p>Prefer a local import? Download the deterministic Codex bundle built from the same tested source.</p>
+          <p style="margin-top:20px"><a class="pill" href="sunday-letter-codex.plugin" download>Download v0.4.0</a></p>
           <ul><li>Python standard library only</li><li>Private loopback archive server</li><li>Pause, Resume, Export, and Delete</li></ul>
         </article>
       </div>
-      <p class="non-goals"><strong>Not supported yet:</strong> Claude/Cowork runtime paths, ChatGPT or Gemini installation, email or messaging delivery, remote synchronization, and cross-agent profile export.</p>
+      <p class="non-goals"><strong>Not supported yet:</strong> Cowork runtime paths, ChatGPT or Gemini installation, email or messaging delivery, remote synchronization, and cross-agent profile export.</p>
     </section>
   </main>
 
   <footer>
-    <span>The Sunday Letter · v0.3.0 · MIT</span>
+    <span>The Sunday Letter · v0.4.0 · MIT</span>
     <div><a href="sample-letter.html">Sample</a><a href="https://github.com/selinayfilizp/sunday-letter">GitHub</a><a href="sunday-letter-codex.plugin" download>Download</a></div>
   </footer>
   <script>
@@ -149,7 +152,7 @@ cd sunday-letter
       "No meaningful delta. No letter this week.",
       "One question, tied to a dated source.",
       "A retired belief stays visible in the ledger.",
-      "Selected local Codex conversations only.",
+      "Selected local agent conversations only.",
       "Firm, soft, or guess. Never a fake percentage."
     ];
     function buildRing(target, count, radius) {

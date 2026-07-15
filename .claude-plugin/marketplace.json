@@ -1,0 +1,32 @@
+{
+  "name": "sunday-letter",
+  "owner": {
+    "name": "selinayfilizp",
+    "url": "https://github.com/selinayfilizp"
+  },
+  "metadata": {
+    "description": "Marketplace for the Sunday Letter plugin, a grounded weekly letter from your local agent conversations.",
+    "version": "0.4.0"
+  },
+  "plugins": [
+    {
+      "name": "sunday-letter",
+      "source": "./",
+      "description": "A private local weekly letter grounded in dated, selected Codex or Claude Code conversations. Default is silence: no meaningful change, no letter.",
+      "version": "0.4.0",
+      "author": {
+        "name": "The Sunday Letter"
+      },
+      "homepage": "https://github.com/selinayfilizp/sunday-letter",
+      "license": "MIT",
+      "category": "productivity",
+      "keywords": [
+        "preference-learning",
+        "weekly-digest",
+        "reflection",
+        "personal-agent",
+        "sunday"
+      ]
+    }
+  ]
+}

@@ -1,41 +1,50 @@
 # The Sunday Letter
 
-A private local weekly note grounded in recent Codex conversations: what the
-agent actually completed, what changed in its model of you, what it stopped
-believing, and one question worth sitting with.
+A private local weekly note grounded in recent Codex or Claude Code
+conversations: what the agent actually completed, what changed in its model of
+you, what it stopped believing, and one question worth sitting with.
 
 The default is silence. If the selected sources contain no meaningful delta,
 the runtime records a skipped week and writes no letter.
 
-## Supported reference path
+## Supported reference paths
 
-Version 0.3 supports one path end to end: **local Codex state → dated and
-redacted context bundle → canonical signals → validated HTML → atomic ledger →
-private local archive**.
+Version 0.4 supports two paths end to end, both through the same validated
+pipeline: **local agent state (Codex or Claude Code) → dated and redacted
+context bundle → canonical signals → validated HTML → atomic ledger → private
+local archive**.
 
-Claude, Cowork, ChatGPT, email delivery, messaging delivery, and cross-agent
-profile export are not supported runtime paths yet. The editorial contract may
+Cowork, ChatGPT, email delivery, messaging delivery, and cross-agent profile
+export are not supported runtime paths yet. The editorial contract may
 eventually be portable; this release deliberately makes fewer promises.
 
 ## Install
 
-Clone the repository and install the skill and prompts into Codex:
+Clone the repository and install the skill and prompts into every agent home it
+finds (`~/.codex` and `~/.claude`):
 
 ```bash
 git clone https://github.com/selinayfilizp/sunday-letter.git
 cd sunday-letter
-./install.sh
+./install.sh          # or: ./install.sh codex, ./install.sh claude
 ```
 
-Alternatively, download `docs/sunday-letter-codex.plugin` from the published
-site and import the local Codex bundle.
+Claude Code users can install from the plugin marketplace instead:
+
+```text
+/plugin marketplace add selinayfilizp/sunday-letter
+/plugin install sunday-letter@sunday-letter
+```
+
+Codex users can alternatively download `docs/sunday-letter-codex.plugin` from
+the published site and import the local Codex bundle.
 
 Everything uses the Python standard library. No package installation, model API
 key, analytics service, or delivery provider is required.
 
 ## Run
 
-Start a new Codex session after installation, then run:
+Start a new Codex or Claude Code session after installation, then run:
 
 ```text
 /sunday-letter
@@ -44,8 +53,8 @@ Start a new Codex session after installation, then run:
 The skill performs this exact pipeline:
 
 1. Checks `~/sunday-letter/ledger.json` and stops if paused.
-2. Collects dated local Codex messages from the last seven days.
-3. Applies optional `--cwd` or `--thread-id` source filters.
+2. Collects dated local messages from the last seven days, using the collector that matches the host (Codex or Claude Code).
+3. Applies optional `--cwd`, `--thread-id` (Codex), or `--session-id` (Claude Code) source filters.
 4. Redacts common credential shapes and writes an owner-readable transcript
    bundle.
 5. Extracts JSON matching
@@ -62,7 +71,7 @@ confidence percentages, hours saved, and exports.
 
 ## Inspect the source bundle
 
-Run the collector directly to see exactly what a letter may use:
+Run the collector directly to see exactly what a letter may use. In Codex:
 
 ```bash
 python3 skills/sunday-letter/scripts/collect_codex_context.py \
@@ -71,6 +80,20 @@ python3 skills/sunday-letter/scripts/collect_codex_context.py \
   --per-message-limit 3000 \
   --out codex-weekly-context.md
 ```
+
+In Claude Code (reads local session transcripts under `~/.claude/projects`):
+
+```bash
+python3 skills/sunday-letter/scripts/collect_claude_context.py \
+  --days 7 \
+  --limit 80 \
+  --per-message-limit 3000 \
+  --out claude-weekly-context.md
+```
+
+Both collectors apply the same per-message date window, credential redaction,
+and transcript boundaries, and write the same measured header that the
+generator verifies.
 
 Narrow collection to one project with:
 
@@ -135,6 +158,7 @@ archive actions, path traversal, exports, and isolated installation.
 
 ```text
 .
+├── .claude-plugin/            plugin.json and marketplace.json for Claude Code
 ├── .codex-plugin/plugin.json
 ├── commands/
 │   ├── sunday-letter.md
@@ -148,6 +172,7 @@ archive actions, path traversal, exports, and isolated installation.
 │   │   └── letter.css
 │   └── scripts/
 │       ├── core.py
+│       ├── collect_claude_context.py
 │       ├── collect_codex_context.py
 │       ├── generate_letter.py
 │       └── manage_archive.py

@@ -1,7 +1,7 @@
 {
   "name": "sunday-letter",
-  "version": "0.3.0",
-  "description": "A private local weekly letter grounded in dated, selected Codex conversations.",
+  "version": "0.4.0",
+  "description": "A private local weekly letter grounded in dated, selected Codex or Claude Code conversations.",
   "author": {
     "name": "The Sunday Letter"
   },
@@ -18,7 +18,7 @@
   "interface": {
     "displayName": "Sunday Letter",
     "shortDescription": "A grounded weekly letter from local Codex conversations.",
-    "longDescription": "Sunday Letter collects dated local Codex messages, redacts common credentials, validates grounded signals, enforces default silence, and maintains a private local archive. It writes only when something meaningful changed.",
+    "longDescription": "Sunday Letter collects dated local agent messages (Codex or Claude Code), redacts common credentials, validates grounded signals, enforces default silence, and maintains a private local archive. It writes only when something meaningful changed.",
     "developerName": "The Sunday Letter",
     "category": "Productivity",
     "capabilities": [
