@@ -7,7 +7,7 @@
 <meta name="description" content="Once a week, at a day and time you choose, your agent writes you a short letter. What it did for you. What it learned. What it stopped believing. One question worth sitting with.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Caveat:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Libre+Caslon+Display&family=Libre+Caslon+Text:wght@400;700&family=Homemade+Apple&display=swap" rel="stylesheet">
 <style>
 :root{
   --paper:#EEEAE0;
@@ -26,7 +26,9 @@
   --old-ink:rgba(62,46,24,.78);
   --font-sans:'Inter',-apple-system,sans-serif;
   --font-mono:'JetBrains Mono',monospace;
-  --font-hand:'Caveat',cursive;
+  --font-hand:'Homemade Apple',cursive;
+  --font-serif:'Libre Caslon Display',Georgia,serif;
+  --font-serif-text:'Libre Caslon Text',Georgia,serif;
   --sheet-shadow:0 1px 2px rgba(26,22,12,.08),0 12px 40px rgba(26,22,12,.10);
 }
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -60,7 +62,7 @@ body::after{
 #intro.done{opacity:0;pointer-events:none;}
 #intro .stage{
   position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  perspective:1100px;
+  perspective:1600px;
   transition:transform 1.5s cubic-bezier(.6,0,.3,1),opacity 1.4s ease;
 }
 #intro.open .stage{transform:scale(4.4);opacity:0;}
@@ -86,7 +88,7 @@ body::after{
   border-radius:2px;
   box-shadow:0 0 26px rgba(0,0,0,.55);
   padding:9px 8px;overflow:hidden;
-  font-family:var(--font-hand);font-size:8.5px;line-height:1.25;
+  font-family:var(--font-hand);font-size:7px;line-height:1.5;
   color:var(--old-ink);word-break:break-word;
   opacity:0;
   transition:opacity .9s ease var(--d),transform .9s ease var(--d);
@@ -159,7 +161,7 @@ body.ready .topbar{transform:translateY(0);}
 }
 .hero-orbit{
   position:absolute;left:50%;top:54%;width:0;height:0;z-index:0;
-  perspective:1400px;pointer-events:none;
+  pointer-events:none;
 }
 .hero-orbit .tilt{transform:rotateX(64deg) rotateZ(-10deg);transform-style:preserve-3d;}
 .hero-orbit .ring{
@@ -176,7 +178,7 @@ body.ready .topbar{transform:translateY(0);}
   border:1px solid var(--line);border-radius:2px;
   box-shadow:0 14px 30px rgba(26,22,12,.10);
   padding:12px 11px;overflow:hidden;
-  font-family:var(--font-hand);font-size:10px;line-height:1.3;
+  font-family:var(--font-hand);font-size:8px;line-height:1.5;
   color:rgba(26,26,26,.28);word-break:break-word;
 }
 .hero-inner{position:relative;z-index:2;max-width:900px;}
@@ -186,10 +188,11 @@ body.ready .topbar{transform:translateY(0);}
 }
 .hero h1{
   margin:26px 0 0;
-  font-size:clamp(44px,8.4vw,104px);
-  font-weight:800;letter-spacing:-.035em;line-height:1.0;
+  font-family:var(--font-serif);
+  font-size:clamp(42px,7.8vw,96px);
+  font-weight:400;letter-spacing:-.01em;line-height:1.04;
 }
-.hero h1 .ln{display:block;overflow:hidden;}
+.hero h1 .ln{display:block;overflow:hidden;padding-bottom:.14em;margin-bottom:-.14em;}
 .hero h1 .ln span{display:inline-block;transform:translateY(110%);transition:transform 1s cubic-bezier(.2,.8,.2,1);}
 body.ready .hero h1 .ln:nth-child(1) span{transform:translateY(0);transition-delay:.15s;}
 body.ready .hero h1 .ln:nth-child(2) span{transform:translateY(0);transition-delay:.28s;}
@@ -276,8 +279,9 @@ body.ready .scroll-hint{opacity:1;}
   text-transform:uppercase;color:var(--firm);font-weight:600;
 }
 .section-head h2{
-  margin-top:16px;font-size:clamp(30px,4.6vw,54px);font-weight:800;
-  letter-spacing:-.03em;line-height:1.06;max-width:720px;
+  margin-top:16px;font-family:var(--font-serif);
+  font-size:clamp(30px,4.4vw,52px);font-weight:400;
+  letter-spacing:-.005em;line-height:1.1;max-width:760px;
 }
 .section-head p{margin-top:18px;max-width:600px;color:var(--ink-soft);font-size:16px;}
 
@@ -320,10 +324,10 @@ body.ready .scroll-hint{opacity:1;}
   font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--firm);
   letter-spacing:.2em;
 }
-.step h3{margin:14px 0 10px;font-size:19px;font-weight:700;letter-spacing:-.01em;}
+.step h3{margin:14px 0 10px;font-family:var(--font-serif-text);font-size:19px;font-weight:700;letter-spacing:0;}
 .step p{font-size:14.5px;color:var(--ink-soft);}
 .step .hand{
-  display:block;margin-top:18px;font-family:var(--font-hand);font-size:19px;
+  display:block;margin-top:18px;font-family:var(--font-hand);font-size:14px;
   color:var(--firm);transform:rotate(-1.5deg);
 }
 
@@ -371,9 +375,10 @@ body.ready .scroll-hint{opacity:1;}
 .lt-cal{color:var(--firm);font-weight:600;}
 .lt-cal.skip{color:var(--ink-faint);}
 .letter h3.lt-title{
-  margin:26px 0 6px;font-size:clamp(26px,3.4vw,38px);font-weight:800;letter-spacing:-.025em;
+  margin:26px 0 6px;font-family:var(--font-serif);
+  font-size:clamp(26px,3.4vw,38px);font-weight:400;letter-spacing:-.005em;
 }
-.lt-dear{margin:14px 0 4px;font-family:var(--font-hand);font-size:26px;color:var(--ink);}
+.lt-dear{margin:18px 0 4px;font-family:var(--font-hand);font-size:19px;color:var(--ink);}
 .lt-sec{margin-top:30px;}
 .lt-sec-head{
   display:flex;align-items:baseline;gap:12px;
@@ -414,7 +419,7 @@ body.ready .scroll-hint{opacity:1;}
   display:flex;justify-content:space-between;align-items:flex-end;gap:16px;
 }
 .lt-close .who .l1{font-size:14px;color:var(--ink-soft);}
-.lt-close .who .l2{font-family:var(--font-hand);font-size:30px;color:var(--ink);transform:rotate(-2deg);display:inline-block;}
+.lt-close .who .l2{font-family:var(--font-hand);font-size:21px;color:var(--ink);transform:rotate(-2deg);display:inline-block;}
 .lt-xxx{font-family:var(--font-mono);font-size:12px;letter-spacing:.4em;color:var(--ink-faint);}
 .lt-silent-body{margin-top:18px;font-size:15px;color:var(--ink-soft);max-width:560px;}
 .lt-silent-body code{font-family:var(--font-mono);font-size:12.5px;background:rgba(26,26,26,.05);padding:1px 6px;border-radius:3px;}
@@ -434,7 +439,7 @@ body.ready .scroll-hint{opacity:1;}
   font-family:var(--font-mono);font-size:26px;font-weight:600;color:var(--paper-3);
   -webkit-text-stroke:1px var(--ink-faint);letter-spacing:.04em;
 }
-.rule h3{margin:12px 0 8px;font-size:17px;font-weight:700;letter-spacing:-.01em;}
+.rule h3{margin:12px 0 8px;font-family:var(--font-serif-text);font-size:17px;font-weight:700;letter-spacing:0;}
 .rule p{font-size:13.5px;color:var(--ink-soft);line-height:1.62;}
 .rule .badge{margin:0 2px 0 0;transform:translateY(-1px);}
 .rule .strike{text-decoration:line-through;text-decoration-color:var(--guess);text-decoration-thickness:2px;}
@@ -450,7 +455,7 @@ body.ready .scroll-hint{opacity:1;}
   font-family:var(--font-mono);font-size:10px;letter-spacing:.22em;
   text-transform:uppercase;color:var(--firm);font-weight:600;
 }
-.opt h3{margin:12px 0 8px;font-size:20px;font-weight:700;letter-spacing:-.015em;}
+.opt h3{margin:12px 0 8px;font-family:var(--font-serif-text);font-size:19px;font-weight:700;letter-spacing:0;}
 .opt p{font-size:14px;color:var(--ink-soft);}
 .opt p code,.faq code{font-family:var(--font-mono);font-size:12px;background:rgba(26,26,26,.05);padding:1px 6px;border-radius:3px;}
 .code{
@@ -490,7 +495,7 @@ body.ready .scroll-hint{opacity:1;}
   max-width:1080px;margin:70px auto 0;padding:clamp(28px,4vw,48px);
 }
 .walk .lab{font-family:var(--font-mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--firm);font-weight:600;}
-.walk h3{margin:12px 0 6px;font-size:24px;font-weight:800;letter-spacing:-.02em;}
+.walk h3{margin:12px 0 6px;font-family:var(--font-serif);font-size:26px;font-weight:400;letter-spacing:0;}
 .walk > p{font-size:14.5px;color:var(--ink-soft);max-width:560px;}
 .walk-steps{margin-top:28px;display:grid;gap:0;}
 .wstep{
@@ -527,12 +532,12 @@ body.ready .scroll-hint{opacity:1;}
   transform:rotate(-.6deg);
 }
 .closing .lt-meta{border-bottom:none;padding-bottom:0;}
-.closing h2{margin:18px 0 14px;font-size:clamp(26px,3.6vw,38px);font-weight:800;letter-spacing:-.025em;line-height:1.15;}
+.closing h2{margin:18px 0 14px;font-family:var(--font-serif);font-size:clamp(26px,3.6vw,38px);font-weight:400;letter-spacing:-.005em;line-height:1.18;}
 .closing p{font-size:15px;color:var(--ink-soft);}
 .closing .hero-ctas{margin-top:30px;opacity:1;transform:none;justify-content:flex-start;transition:none;}
 .closing .sig{margin-top:34px;display:flex;justify-content:space-between;align-items:flex-end;}
 .closing .sig .l1{font-size:14px;color:var(--ink-soft);}
-.closing .sig .l2{font-family:var(--font-hand);font-size:32px;transform:rotate(-2deg);display:inline-block;}
+.closing .sig .l2{font-family:var(--font-hand);font-size:22px;transform:rotate(-2deg);display:inline-block;}
 
 /* ============ footer ============ */
 footer{
@@ -627,7 +632,7 @@ footer .links a:hover{color:var(--ink);}
   <section class="section">
     <div class="section-head rev">
       <div class="overline">How it lands</div>
-      <h2>Three steps. Then it just arrives.</h2>
+      <h2>Three steps, then it just arrives.</h2>
     </div>
     <div class="steps">
       <div class="step sheet rev"><div class="tape"></div>
@@ -655,7 +660,7 @@ footer .links a:hover{color:var(--ink);}
   <section class="section archive" id="letter">
     <div class="section-head rev">
       <div class="overline">A sample week · Teddy, cheesemonger</div>
-      <h2>One archive. Fourteen letters in.</h2>
+      <h2>One archive, fourteen letters deep.</h2>
       <p>This is a worked example: five real letters from a fictional subscriber. Flip through the index. Notice what gets retired, and which week ships nothing at all.</p>
     </div>
     <div class="archive-grid">
@@ -842,7 +847,7 @@ footer .links a:hover{color:var(--ink);}
   <section class="section" id="contract">
     <div class="section-head rev">
       <div class="overline">The contract</div>
-      <h2>Six rules. Non-negotiable.</h2>
+      <h2>Six rules, none of them negotiable.</h2>
       <p>The letter is a product thesis, not an aesthetic. Every letter the agent writes obeys the same contract, whether it's the first week or the fiftieth.</p>
     </div>
     <div class="rules">
@@ -873,7 +878,7 @@ footer .links a:hover{color:var(--ink);}
       </div>
       <div class="rule sheet rev">
         <div class="rn">06</div>
-        <h3>One question. Not a survey.</h3>
+        <h3>One question, not a survey.</h3>
         <p>One generative, specific, unsettleable question. Not ten. Not a checklist. The kind of question that, if you sit with it for a day, changes something. Reply by voice memo, or don't reply at all.</p>
       </div>
     </div>
