@@ -8,7 +8,7 @@
   <title>The Sunday Letter · Local Codex reflection</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Homemade+Apple&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Libre+Caslon+Display&display=swap" rel="stylesheet">
   <style>
     :root {
       --paper:#eeeae0; --paper-2:#e5e0d2; --card:#f8f5ec; --ink:#1a1a1a;
@@ -16,28 +16,41 @@
       --rule:rgba(26,26,26,.12); --shadow:0 24px 70px rgba(26,26,26,.12);
       --ui:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
       --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+      --serif:"Libre Caslon Display",Georgia,serif; --hand:"Homemade Apple",cursive;
     }
-    *{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;background:linear-gradient(#dbe0e8 0,#eeeae0 390px);color:var(--ink);font-family:var(--ui)}
+    *{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;background:linear-gradient(#dbe0e8 0,#eeeae0 390px);color:var(--ink);font-family:var(--ui);overflow-x:hidden} em,i{font-style:normal}
+    body::after{content:"";position:fixed;inset:0;z-index:1000;pointer-events:none;opacity:.38;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .025 0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E")}
     a{color:inherit}.topbar{width:min(1180px,calc(100% - 40px));margin:auto;padding:22px 0;display:flex;align-items:center;justify-content:space-between;gap:20px}
     .wordmark{font-weight:700;text-decoration:none;white-space:nowrap}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:8px}
     nav{display:flex;align-items:center;gap:24px;font-size:13px}nav a{text-decoration:none;color:var(--ink-2)}.pill{display:inline-block;background:var(--ink);color:white!important;border-radius:6px;padding:10px 14px;text-decoration:none;font-weight:600}
-    .hero{width:min(1180px,calc(100% - 40px));margin:70px auto 76px}.eyebrow,.kicker{font:500 11px/1.5 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
-    h1{max-width:900px;margin:14px 0 20px;font-size:clamp(48px,8vw,92px);line-height:.98;letter-spacing:-.055em}.hero p{max-width:700px;margin:0;color:var(--ink-2);font-size:20px;line-height:1.6}
+    .hero{position:relative;width:min(1180px,calc(100% - 40px));margin:70px auto 76px;isolation:isolate}.hero>*:not(.hero-orbit){position:relative;z-index:2}.eyebrow,.kicker{font:500 11px/1.5 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+    h1{max-width:940px;margin:14px 0 20px;font:400 clamp(52px,8.5vw,104px)/.94 var(--serif);letter-spacing:-.018em}.hero p{max-width:700px;margin:0;color:var(--ink-2);font-size:20px;line-height:1.6}
+    .hand-note{display:block;margin-top:22px;color:var(--green);font:14px/1.7 var(--hand);transform:rotate(-1.5deg)}
     .badges{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}.badge{border:1px solid var(--rule);border-radius:999px;padding:7px 10px;font:500 11px/1 var(--mono);color:var(--green);background:rgba(255,255,255,.25)}
     .hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}.secondary{display:inline-block;border-bottom:1px solid var(--ink);padding:10px 2px 6px;text-decoration:none;font-weight:600;font-size:14px}
     .section{width:min(1180px,calc(100% - 40px));margin:0 auto;padding:88px 0;border-top:1px solid var(--rule)}.section-head{display:grid;grid-template-columns:180px minmax(0,680px);gap:28px;margin-bottom:44px}
-    h2{margin:0;font-size:clamp(32px,5vw,56px);line-height:1.05;letter-spacing:-.045em}.section-head p{margin:12px 0 0;color:var(--muted);font-size:17px;line-height:1.6}
+    h2{margin:0;font:400 clamp(36px,5.5vw,64px)/1.02 var(--serif);letter-spacing:-.015em}.section-head p{margin:12px 0 0;color:var(--muted);font-size:17px;line-height:1.6}
     .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.step,.trust-card,.install-card{background:rgba(248,245,236,.72);border:1px solid var(--rule);border-radius:10px;padding:25px}
-    .num{font:600 11px/1 var(--mono);color:var(--green);letter-spacing:.1em}.step h3,.trust-card h3,.install-card h3{margin:28px 0 8px;font-size:19px;letter-spacing:-.02em}.step p,.trust-card p,.install-card p{margin:0;color:var(--muted);line-height:1.55}
+    .num{font:600 11px/1 var(--mono);color:var(--green);letter-spacing:.1em}.step h3,.trust-card h3,.install-card h3{margin:28px 0 8px;font:400 25px/1.1 var(--serif)}.step p,.trust-card p,.install-card p{margin:0;color:var(--muted);line-height:1.55}
     .sample{background:var(--card);border:1px solid var(--rule);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}.sample-bar{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:16px 20px;background:var(--paper-2);border-bottom:1px solid var(--rule);font:500 11px/1 var(--mono);text-transform:uppercase;letter-spacing:.08em}.sample iframe{display:block;width:100%;height:720px;border:0;background:var(--paper)}
     .trust-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.trust-card h3{margin-top:0}.trust-card strong{color:var(--ink)}
     .install-grid{display:grid;grid-template-columns:1.4fr .8fr;gap:14px}.install-card h3{margin-top:0}.code{margin:18px 0;padding:18px;border-radius:7px;background:#1a1a1a;color:#e9e5da;overflow:auto;font:12px/1.7 var(--mono);white-space:pre}.install-card ul{margin:18px 0 0;padding-left:20px;color:var(--muted);line-height:1.7}
     .non-goals{margin-top:20px;padding-top:20px;border-top:1px solid var(--rule);color:var(--muted);font-size:13px;line-height:1.6}
     footer{width:min(1180px,calc(100% - 40px));margin:auto;padding:36px 0 48px;border-top:1px solid var(--rule);display:flex;justify-content:space-between;gap:20px;color:var(--muted);font-size:12px}footer div{display:flex;gap:18px}
+    #intro{position:fixed;inset:0;z-index:2000;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#0b0a08;color:#efe7d2;cursor:pointer;transition:opacity 1.05s ease}
+    #intro[hidden]{display:none}#intro.done{opacity:0;pointer-events:none}.vortex-stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;perspective:1500px;transition:transform 1.5s cubic-bezier(.6,0,.3,1),opacity 1.2s ease}#intro.open .vortex-stage{transform:scale(4.4);opacity:0}
+    .vortex-tilt{transform:rotateX(58deg) rotateZ(-14deg);transform-style:preserve-3d}.vortex-ring{position:relative;width:0;height:0;transform-style:preserve-3d;animation:vortex-spin 26s linear infinite}.vortex-wrap{position:absolute;transform:rotateY(var(--angle)) translateZ(var(--radius));transform-style:preserve-3d}.vortex-card{position:absolute;left:-46px;top:-64px;width:92px;height:128px;padding:9px 8px;overflow:hidden;border-radius:2px;background:linear-gradient(160deg,#f3ecd9,#e5d8bb);box-shadow:0 0 26px rgba(0,0,0,.55);color:rgba(62,46,24,.76);font:7px/1.5 var(--hand);transform:rotateX(96deg) rotate(var(--jitter));opacity:0;transition:opacity .8s ease var(--delay)}#intro.assembled .vortex-card{opacity:1}
+    @keyframes vortex-spin{to{transform:rotateY(-360deg)}}.intro-copy{position:relative;z-index:2;text-align:center;font:12px/1.6 var(--mono);letter-spacing:.28em;text-transform:uppercase}.intro-copy small{display:block;margin-top:12px;color:rgba(239,231,210,.45);font-size:9px}.intro-dot{display:inline-block;width:7px;height:7px;margin-right:10px;border-radius:50%;background:var(--green)}
+    .hero-orbit{position:absolute;z-index:0;left:62%;top:42%;pointer-events:none;opacity:.17}.hero-orbit .vortex-tilt{transform:rotateX(64deg) rotateZ(-10deg)}.hero-orbit .vortex-ring{animation-duration:70s}.hero-orbit .vortex-card{width:88px;height:122px;left:-44px;top:-61px;opacity:1;background:var(--card);border:1px solid var(--rule);box-shadow:0 12px 30px rgba(26,22,12,.12);color:rgba(26,26,26,.42)}
     @media(max-width:800px){nav a:not(.pill){display:none}.hero{margin:44px auto 58px}.hero p{font-size:17px}.section{padding:64px 0}.section-head{grid-template-columns:1fr}.steps,.trust-grid,.install-grid{grid-template-columns:1fr}.sample iframe{height:620px}.topbar{width:min(100% - 28px,1180px)}.hero,.section,footer{width:min(100% - 28px,1180px)}footer{flex-direction:column}}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01s!important;transition-duration:.01s!important}html{scroll-behavior:auto}}
   </style>
 </head>
 <body>
+  <div id="intro" hidden role="button" tabindex="0" aria-label="Open The Sunday Letter">
+    <div class="vortex-stage"><div class="vortex-tilt"><div class="vortex-ring" id="intro-ring"></div></div></div>
+    <div class="intro-copy"><span class="intro-dot"></span>The Sunday Letter<small>Click to open · plays once per session</small></div>
+  </div>
   <header class="topbar">
     <a class="wordmark" href="#top"><span class="dot"></span>The Sunday Letter</a>
     <nav aria-label="Primary navigation">
@@ -50,9 +63,11 @@
 
   <main id="top">
     <section class="hero">
+      <div class="hero-orbit" aria-hidden="true"><div class="vortex-tilt"><div class="vortex-ring" id="hero-ring"></div></div></div>
       <div class="eyebrow">A local Codex experiment · v0.3.0</div>
       <h1>A weekly note about what actually changed.</h1>
       <p>The Sunday Letter turns selected, dated Codex conversations into a restrained private letter: what the agent completed, what it learned, what it stopped believing, and one question. If the week has no meaningful delta, it writes nothing.</p>
+      <span class="hand-note">fifty-two chances a year, only when the week deserves one</span>
       <div class="badges">
         <span class="badge">Local Codex sources only</span>
         <span class="badge">Per-message date window</span>
@@ -129,5 +144,59 @@ cd sunday-letter
     <span>The Sunday Letter · v0.3.0 · MIT</span>
     <div><a href="sample-letter.html">Sample</a><a href="https://github.com/selinayfilizp/sunday-letter">GitHub</a><a href="sunday-letter-codex.plugin" download>Download</a></div>
   </footer>
+  <script>
+  (function () {
+    var lines = [
+      "Consequences first. Claims follow the work.",
+      "No meaningful delta. No letter this week.",
+      "One question, tied to a dated source.",
+      "A retired belief stays visible in the ledger.",
+      "Selected local Codex conversations only.",
+      "Firm, soft, or guess. Never a fake percentage."
+    ];
+    function buildRing(target, count, radius) {
+      if (!target) return;
+      for (var index = 0; index < count; index += 1) {
+        var wrap = document.createElement("div");
+        wrap.className = "vortex-wrap";
+        wrap.style.setProperty("--angle", (360 / count * index) + "deg");
+        wrap.style.setProperty("--radius", radius + "px");
+        var card = document.createElement("div");
+        card.className = "vortex-card";
+        card.style.setProperty("--jitter", ((index % 5) - 2) * 2 + "deg");
+        card.style.setProperty("--delay", (index * .04) + "s");
+        card.textContent = lines[index % lines.length];
+        wrap.appendChild(card);
+        target.appendChild(wrap);
+      }
+    }
+    buildRing(document.getElementById("hero-ring"), 16, 500);
+    var intro = document.getElementById("intro");
+    var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var seen = false;
+    try { seen = sessionStorage.getItem("sunday-letter-intro") === "1"; } catch (error) {}
+    if (reduced || seen) {
+      intro.remove();
+      return;
+    }
+    intro.hidden = false;
+    buildRing(document.getElementById("intro-ring"), 24, 330);
+    requestAnimationFrame(function () { intro.classList.add("assembled"); });
+    var opened = false;
+    function openLetter() {
+      if (opened) return;
+      opened = true;
+      try { sessionStorage.setItem("sunday-letter-intro", "1"); } catch (error) {}
+      intro.classList.add("open");
+      window.setTimeout(function () { intro.classList.add("done"); }, 600);
+      window.setTimeout(function () { intro.remove(); }, 1700);
+    }
+    intro.addEventListener("click", openLetter);
+    intro.addEventListener("keydown", function (event) {
+      if (["Enter", " ", "Escape"].indexOf(event.key) >= 0) openLetter();
+    });
+    window.setTimeout(openLetter, 4300);
+  }());
+  </script>
 </body>
 </html>
