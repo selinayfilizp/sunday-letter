@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Top-level wrapper for the Codex-local Sunday Letter archive manager."""
+"""Top-level wrapper for the agent-local Sunday Letter archive manager."""
 
 from __future__ import annotations
 

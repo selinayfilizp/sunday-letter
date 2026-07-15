@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import multiprocessing
 import subprocess
 import sys
 import tempfile
@@ -16,6 +17,25 @@ import core  # noqa: E402
 import generate_letter  # noqa: E402
 
 
+def _concurrent_ship(
+    root: str,
+    signals: dict,
+    start: object,
+    results: object,
+) -> None:
+    start.wait(10)
+    try:
+        result = generate_letter.process_signals(
+            signals,
+            out_path=None,
+            ledger_path=Path(root) / "ledger.json",
+        )
+    except Exception as error:  # pragma: no cover - reported to the parent process
+        results.put(("error", repr(error)))
+    else:
+        results.put(("ok", result.letter_number))
+
+
 def valid_signals() -> dict:
     return {
         "schema_version": "1.0",
@@ -28,7 +48,7 @@ def valid_signals() -> dict:
             "message_count": 8,
             "window_start": "2026-07-07T00:00:00Z",
             "window_end": "2026-07-14T00:00:00Z",
-            "scope": "selected local Codex threads",
+            "scope": "selected local agent conversations",
         },
         "consequences": [
             {
@@ -109,6 +129,8 @@ class PipelineTests(unittest.TestCase):
         self.assertNotIn("<img", rendered)
         self.assertIn("&lt;script", rendered)
         self.assertIn("<strong>kept</strong>", rendered)
+        self.assertIn("Local agent sources only", rendered)
+        self.assertNotIn("recent Codex conversations", rendered)
         ledger = json.loads(self.ledger.read_text())
         self.assertEqual(ledger["letter_number"], 1)
         self.assertEqual(ledger["last_status"], "shipped")
@@ -132,6 +154,36 @@ class PipelineTests(unittest.TestCase):
         self.assertEqual(result2.letter_number, 2)
         self.assertIn("Letter №1", (self.letters / "one.html").read_text())
         self.assertIn("Letter №2", (self.letters / "two.html").read_text())
+
+    def test_concurrent_hosts_receive_unique_letter_numbers(self) -> None:
+        context = multiprocessing.get_context("fork")
+        start = context.Event()
+        results = context.Queue()
+        workers = [
+            context.Process(
+                target=_concurrent_ship,
+                args=(str(self.root), valid_signals(), start, results),
+            )
+            for _ in range(4)
+        ]
+        for worker in workers:
+            worker.start()
+        start.set()
+        for worker in workers:
+            worker.join(20)
+            self.assertFalse(worker.is_alive(), "concurrent letter generation deadlocked")
+            self.assertEqual(worker.exitcode, 0)
+
+        outcomes = [results.get(timeout=2) for _ in workers]
+        self.assertFalse([value for status, value in outcomes if status == "error"])
+        numbers = sorted(value for status, value in outcomes if status == "ok")
+        self.assertEqual(numbers, [1, 2, 3, 4])
+
+        ledger = json.loads(self.ledger.read_text())
+        self.assertEqual(ledger["letter_number"], 4)
+        self.assertEqual(len(ledger["letters"]), 4)
+        for record in ledger["letters"]:
+            self.assertTrue((self.root / record["file"]).exists())
 
     def test_validation_rejects_unmeasured_metrics(self) -> None:
         signals = valid_signals()

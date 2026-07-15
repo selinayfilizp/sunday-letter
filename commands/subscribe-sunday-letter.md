@@ -35,9 +35,13 @@ the background; each scheduled invocation performs a bounded local collection.
 Pause and resume the content pipeline independently of the schedule with:
 
 ```bash
-# Use the skill directory for your host: ~/.codex/skills or ~/.claude/skills
-python3 "$HOME/.codex/skills/sunday-letter/scripts/manage_archive.py" --root "$HOME/sunday-letter" pause
-python3 "$HOME/.codex/skills/sunday-letter/scripts/manage_archive.py" --root "$HOME/sunday-letter" resume
+# Codex
+python3 "${CODEX_HOME:-$HOME/.codex}/skills/sunday-letter/scripts/manage_archive.py" --root "$HOME/sunday-letter" pause
+python3 "${CODEX_HOME:-$HOME/.codex}/skills/sunday-letter/scripts/manage_archive.py" --root "$HOME/sunday-letter" resume
+
+# Claude Code
+python3 "${CLAUDE_HOME:-$HOME/.claude}/skills/sunday-letter/scripts/manage_archive.py" --root "$HOME/sunday-letter" pause
+python3 "${CLAUDE_HOME:-$HOME/.claude}/skills/sunday-letter/scripts/manage_archive.py" --root "$HOME/sunday-letter" resume
 ```
 
 When finished, restate the exact schedule, source scope, and local archive path.

@@ -14,8 +14,10 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_OUT = ROOT / "docs" / "sunday-letter-codex.plugin"
 DEFAULT_SAMPLE = ROOT / "docs" / "sample-letter.html"
 INCLUDE = (
+    Path("CHANGELOG.md"),
     Path("LICENSE"),
     Path("README.md"),
+    Path("SECURITY.md"),
     Path("install.sh"),
     Path("generate_letter.py"),
     Path("manage_archive.py"),
@@ -28,6 +30,18 @@ INCLUDE = (
 # The Codex bundle ships the Codex reference path only. Claude Code users
 # install from the repository (install.sh claude) or the plugin marketplace.
 EXCLUDE_NAMES = frozenset({"collect_claude_context.py"})
+
+SAMPLE_SOCIAL_METADATA = """<meta property="og:type" content="website">
+<meta property="og:title" content="A sample Sunday Letter">
+<meta property="og:description" content="A rendered example of the weekly letter: consequences, calibrated observations, one retired belief, one question.">
+<meta property="og:url" content="https://selinayfilizp.github.io/sunday-letter/sample-letter.html">
+<meta property="og:image" content="https://selinayfilizp.github.io/sunday-letter/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="A sample Sunday Letter">
+<meta name="twitter:description" content="A rendered example of the weekly letter: consequences, calibrated observations, one retired belief, one question.">
+<meta name="twitter:image" content="https://selinayfilizp.github.io/sunday-letter/og.png">"""
 
 
 def _files() -> list[Path]:
@@ -79,6 +93,12 @@ def build_sample(out_path: Path) -> Path:
         check=True,
     )
     out_path.with_suffix(".signals.json").unlink(missing_ok=True)
+    rendered = out_path.read_text(encoding="utf-8")
+    description = '<meta name="description"'
+    if description not in rendered:
+        raise RuntimeError("sample renderer did not produce the expected description metadata")
+    rendered = rendered.replace(description, f"{SAMPLE_SOCIAL_METADATA}\n{description}", 1)
+    out_path.write_text(rendered, encoding="utf-8")
     return out_path
 
 

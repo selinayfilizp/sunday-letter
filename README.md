@@ -2,7 +2,9 @@
 
 ![A weekly letter from your AI, about you](docs/og.png)
 
-[Site](https://selinayfilizp.github.io/sunday-letter/) · [Sample letter](https://selinayfilizp.github.io/sunday-letter/sample-letter.html) · MIT
+[Site](https://selinayfilizp.github.io/sunday-letter/) · [Sample letter](https://selinayfilizp.github.io/sunday-letter/sample-letter.html) · [Security](SECURITY.md) · MIT
+
+[![Tests](https://github.com/selinayfilizp/sunday-letter/actions/workflows/test.yml/badge.svg)](https://github.com/selinayfilizp/sunday-letter/actions/workflows/test.yml)
 
 A private local weekly note grounded in recent Codex or Claude Code
 conversations: what the agent actually completed, what changed in its model of
@@ -68,7 +70,9 @@ The skill performs this exact pipeline:
 8. Sanitizes rich text to `<strong>` and `<em>`, then adds a restrictive
    Content Security Policy.
 9. Writes the HTML letter and validated signals record atomically.
-10. Updates the ledger atomically and rebuilds `~/sunday-letter/index.html`.
+10. Locks the shared archive, updates the ledger atomically, and rebuilds
+    `~/sunday-letter/index.html`. Concurrent Codex and Claude Code runs are
+    serialized so they cannot reuse a letter number or overwrite each other.
 
 The runtime owns the letter number. It rejects unmeasured legacy fields such as
 confidence percentages, hours saved, and exports.
@@ -146,7 +150,8 @@ python3 manage_archive.py --root ~/sunday-letter delete letters/2026-07-12-lette
 ```
 
 Deleting this archive removes Sunday Letter artifacts only. It does **not**
-delete Codex's underlying conversation history or any other Codex memory.
+delete the underlying Codex or Claude Code conversation history or unrelated
+agent memory. See [SECURITY.md](SECURITY.md) for the complete local-data boundary.
 
 ## Tests
 
@@ -156,7 +161,9 @@ python3 -m unittest discover -s tests -v
 
 The suite covers schema validation, delta enforcement, numbering, ledger
 updates, HTML safety, per-message date filtering, redaction, source selection,
-archive actions, path traversal, exports, and isolated installation.
+concurrent host runs, archive actions, path traversal, deterministic release
+artifacts, social metadata, exports, and isolated installation. GitHub Actions
+runs the suite on macOS and Linux.
 
 ## Repository layout
 
@@ -181,6 +188,8 @@ archive actions, path traversal, exports, and isolated installation.
 │       ├── generate_letter.py
 │       └── manage_archive.py
 ├── tests/
+├── CHANGELOG.md
+├── SECURITY.md
 ├── generate_letter.py
 ├── manage_archive.py
 └── install.sh

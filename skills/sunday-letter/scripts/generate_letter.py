@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""Validate, gate, render, and record one Codex-local Sunday Letter run."""
+"""Validate, gate, render, and record one agent-local Sunday Letter run."""
 
 from __future__ import annotations
 
 import argparse
 import json
 import os
+from contextlib import nullcontext
 from copy import deepcopy
 from dataclasses import dataclass
 from pathlib import Path
@@ -16,6 +17,7 @@ from core import (
     atomic_write_text,
     default_ledger,
     ensure_private_directory,
+    ledger_lock,
     load_ledger,
     sanitize_rich_text,
     save_ledger,
@@ -234,7 +236,7 @@ def render_letter(
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
 <title>Letter №{letter_number} · {text(validated['date'])} · The Sunday Letter</title>
-<meta name="description" content="A local weekly note grounded in recent Codex conversations.">
+<meta name="description" content="A local weekly note grounded in recent agent conversations.">
 {_style_block()}
 </head>
 <body>
@@ -264,7 +266,7 @@ def render_letter(
       <div class="close-mark">× × ×</div>
     </div>
     <div class="note-foot">
-      <div class="note-foot-left">Local Codex sources only</div>
+      <div class="note-foot-left">Local agent sources only</div>
       <div class="note-foot-right">{export_link}{archive_link}</div>
     </div>
   </article>
@@ -356,86 +358,88 @@ def process_signals(
     validated = validate_signals(signals)
     _verify_source_summary(validated, expected_source_summary)
     ledger_path = Path(ledger_path).expanduser()
-    ledger = load_ledger(ledger_path) if update_ledger else default_ledger()
-    if update_ledger and ledger.get("paused"):
-        raise PausedError(f"Sunday Letter is paused in {ledger_path}")
+    lock = ledger_lock(ledger_path) if update_ledger else nullcontext()
+    with lock:
+        ledger = load_ledger(ledger_path) if update_ledger else default_ledger()
+        if update_ledger and ledger.get("paused"):
+            raise PausedError(f"Sunday Letter is paused in {ledger_path}")
 
-    run_date = today_iso()
-    if validated.get("skip"):
-        if update_ledger:
-            ledger["last_run"] = run_date
-            ledger["last_status"] = "skipped"
-            ledger["last_skip_reason"] = validated["reason"]
-            ledger["events"].append(
-                {"date": run_date, "status": "skipped", "reason": validated["reason"]}
+        run_date = today_iso()
+        if validated.get("skip"):
+            if update_ledger:
+                ledger["last_run"] = run_date
+                ledger["last_status"] = "skipped"
+                ledger["last_skip_reason"] = validated["reason"]
+                ledger["events"].append(
+                    {"date": run_date, "status": "skipped", "reason": validated["reason"]}
+                )
+                save_ledger(ledger_path, ledger)
+                _rebuild_archive(ledger_path)
+            return RunResult("skipped", None, None, validated["reason"])
+
+        letter_number = ledger["letter_number"] + 1 if update_ledger else int(
+            validated.get("letter_number", 1)
+        )
+        prepared = deepcopy(validated)
+        prepared["letter_number"] = letter_number
+        if out_path is None:
+            out_path = (
+                ledger_path.parent / "letters" / f"{run_date}-letter-{letter_number:02d}.html"
+                if update_ledger
+                else Path("preview.html")
             )
+        out_path = Path(out_path).expanduser()
+
+        if update_ledger:
+            archive_root = ensure_private_directory(ledger_path.parent)
+            try:
+                out_path.resolve().relative_to(archive_root.resolve())
+            except ValueError:
+                pass
+            else:
+                ensure_private_directory(out_path.parent)
+
+        rendered = render_letter(
+            prepared,
+            archive_href=_relative_archive_href(out_path, ledger_path) if update_ledger else None,
+            export_href=out_path.name,
+        )
+        atomic_write_text(out_path, rendered)
+        signals_out = out_path.with_suffix(".signals.json")
+        if update_ledger:
+            atomic_write_text(
+                signals_out,
+                json.dumps(prepared, indent=2, ensure_ascii=False, sort_keys=True) + "\n",
+            )
+
+        if update_ledger:
+            ledger["letter_number"] = letter_number
+            ledger["last_run"] = run_date
+            ledger["last_shipped"] = run_date
+            ledger["last_status"] = "shipped"
+            ledger["last_skip_reason"] = None
+            ledger["open_question"] = prepared["question"]
+            for retired in prepared["retired"]:
+                ledger["retired"].append({**retired, "retired_on": run_date})
+            record = {
+                "number": letter_number,
+                "date": prepared["date"],
+                "headline": prepared["hero_headline"],
+                "file": _ledger_file_value(out_path, ledger_path),
+                "signals_file": _ledger_file_value(signals_out, ledger_path),
+                "status": "shipped",
+            }
+            ledger["letters"].append(record)
+            ledger["events"].append({"date": run_date, **record})
             save_ledger(ledger_path, ledger)
             _rebuild_archive(ledger_path)
-        return RunResult("skipped", None, None, validated["reason"])
 
-    letter_number = ledger["letter_number"] + 1 if update_ledger else int(
-        validated.get("letter_number", 1)
-    )
-    prepared = deepcopy(validated)
-    prepared["letter_number"] = letter_number
-    if out_path is None:
-        out_path = (
-            ledger_path.parent / "letters" / f"{run_date}-letter-{letter_number:02d}.html"
-            if update_ledger
-            else Path("preview.html")
-        )
-    out_path = Path(out_path).expanduser()
-
-    if update_ledger:
-        archive_root = ensure_private_directory(ledger_path.parent)
-        try:
-            out_path.resolve().relative_to(archive_root.resolve())
-        except ValueError:
-            pass
-        else:
-            ensure_private_directory(out_path.parent)
-
-    rendered = render_letter(
-        prepared,
-        archive_href=_relative_archive_href(out_path, ledger_path) if update_ledger else None,
-        export_href=out_path.name,
-    )
-    atomic_write_text(out_path, rendered)
-    signals_out = out_path.with_suffix(".signals.json")
-    if update_ledger:
-        atomic_write_text(
-            signals_out,
-            json.dumps(prepared, indent=2, ensure_ascii=False, sort_keys=True) + "\n",
-        )
-
-    if update_ledger:
-        ledger["letter_number"] = letter_number
-        ledger["last_run"] = run_date
-        ledger["last_shipped"] = run_date
-        ledger["last_status"] = "shipped"
-        ledger["last_skip_reason"] = None
-        ledger["open_question"] = prepared["question"]
-        for retired in prepared["retired"]:
-            ledger["retired"].append({**retired, "retired_on": run_date})
-        record = {
-            "number": letter_number,
-            "date": prepared["date"],
-            "headline": prepared["hero_headline"],
-            "file": _ledger_file_value(out_path, ledger_path),
-            "signals_file": _ledger_file_value(signals_out, ledger_path),
-            "status": "shipped",
-        }
-        ledger["letters"].append(record)
-        ledger["events"].append({"date": run_date, **record})
-        save_ledger(ledger_path, ledger)
-        _rebuild_archive(ledger_path)
-
-    return RunResult("shipped", out_path, letter_number)
+        return RunResult("shipped", out_path, letter_number)
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Validate, gate, render, and record a Codex-local Sunday Letter."
+        description="Validate, gate, render, and record an agent-local Sunday Letter."
     )
     parser.add_argument("--signals", type=Path, required=True, help="Canonical signals JSON.")
     parser.add_argument(

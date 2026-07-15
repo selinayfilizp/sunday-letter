@@ -48,8 +48,8 @@
     .install-grid{display:grid;grid-template-columns:1.4fr .8fr;gap:14px}.install-card h3{margin-top:0}.code{margin:18px 0;padding:18px;border-radius:7px;background:#1a1a1a;color:#e9e5da;overflow:auto;font:12px/1.7 var(--mono);white-space:pre}.install-card ul{margin:18px 0 0;padding-left:20px;color:var(--muted);line-height:1.7}
     .non-goals{margin-top:20px;padding-top:20px;border-top:1px solid var(--rule);color:var(--muted);font-size:13px;line-height:1.6}
     footer{width:min(1180px,calc(100% - 40px));margin:auto;padding:36px 0 48px;border-top:1px solid var(--rule);display:flex;justify-content:space-between;gap:20px;color:var(--muted);font-size:12px}footer div{display:flex;gap:18px}
-    #intro{position:fixed;inset:0;z-index:2000;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#0b0a08;color:#efe7d2;cursor:pointer;transition:opacity 1.05s ease}
-    #intro[hidden]{display:none}#intro.done{opacity:0;pointer-events:none}.vortex-stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;perspective:1500px;transition:transform 1.5s cubic-bezier(.6,0,.3,1),opacity 1.2s ease}#intro.open .vortex-stage{transform:scale(4.4);opacity:0}
+    #intro{position:fixed;inset:0;z-index:2000;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#0b0a08;color:#efe7d2;cursor:pointer;transition:opacity .7s ease}
+    #intro[hidden]{display:none}#intro.done{opacity:0;pointer-events:none}.vortex-stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;perspective:1500px;transition:transform 1s cubic-bezier(.6,0,.3,1),opacity .75s ease}#intro.open .vortex-stage{transform:scale(4.4);opacity:0}
     .vortex-tilt{transform:rotateX(58deg) rotateZ(-14deg);transform-style:preserve-3d}.vortex-ring{position:relative;width:0;height:0;transform-style:preserve-3d;animation:vortex-spin 26s linear infinite}.vortex-wrap{position:absolute;transform:rotateY(var(--angle)) translateZ(var(--radius));transform-style:preserve-3d}.vortex-card{position:absolute;left:-46px;top:-64px;width:92px;height:128px;padding:9px 8px;overflow:hidden;border-radius:2px;background:linear-gradient(160deg,#f3ecd9,#e5d8bb);box-shadow:0 0 26px rgba(0,0,0,.55);color:rgba(62,46,24,.76);font:7px/1.5 var(--hand);transform:rotateX(96deg) rotate(var(--jitter));opacity:0;transition:opacity .8s ease var(--delay)}#intro.assembled .vortex-card{opacity:1}
     @keyframes vortex-spin{to{transform:rotateY(-360deg)}}.intro-copy{position:relative;z-index:2;text-align:center;font:12px/1.6 var(--mono);letter-spacing:.28em;text-transform:uppercase}.intro-copy small{display:block;margin-top:12px;color:rgba(239,231,210,.45);font-size:9px}.intro-dot{display:inline-block;width:7px;height:7px;margin-right:10px;border-radius:50%;background:var(--green)}
     .hero-orbit{position:absolute;z-index:0;left:62%;top:42%;pointer-events:none;opacity:.17}.hero-orbit .vortex-tilt{transform:rotateX(64deg) rotateZ(-10deg)}.hero-orbit .vortex-ring{animation-duration:70s}.hero-orbit .vortex-card{width:88px;height:122px;left:-44px;top:-61px;opacity:1;background:var(--card);border:1px solid var(--rule);box-shadow:0 12px 30px rgba(26,22,12,.12);color:rgba(26,26,26,.42)}
@@ -59,7 +59,7 @@
 </head>
 <body>
   <div id="intro" hidden role="button" tabindex="0" aria-label="Open The Sunday Letter">
-    <div class="vortex-stage"><div class="vortex-tilt"><div class="vortex-ring" id="intro-ring"></div></div></div>
+    <div class="vortex-stage" aria-hidden="true"><div class="vortex-tilt"><div class="vortex-ring" id="intro-ring"></div></div></div>
     <div class="intro-copy"><span class="intro-dot"></span>The Sunday Letter<small>Click to open · plays once per session</small></div>
   </div>
   <header class="topbar">
@@ -201,14 +201,14 @@ cd sunday-letter
       opened = true;
       try { sessionStorage.setItem("sunday-letter-intro", "1"); } catch (error) {}
       intro.classList.add("open");
-      window.setTimeout(function () { intro.classList.add("done"); }, 600);
-      window.setTimeout(function () { intro.remove(); }, 1700);
+      window.setTimeout(function () { intro.classList.add("done"); }, 250);
+      window.setTimeout(function () { intro.remove(); }, 1000);
     }
     intro.addEventListener("click", openLetter);
     intro.addEventListener("keydown", function (event) {
       if (["Enter", " ", "Escape"].indexOf(event.key) >= 0) openLetter();
     });
-    window.setTimeout(openLetter, 4300);
+    window.setTimeout(openLetter, 1500);
   }());
   </script>
 </body>

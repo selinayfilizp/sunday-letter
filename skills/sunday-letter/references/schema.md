@@ -45,7 +45,7 @@ window must exactly match the collected Codex bundle:
   "message_count": 31,
   "window_start": "2026-07-07T00:00:00Z",
   "window_end": "2026-07-14T00:00:00Z",
-  "scope": "selected local Codex threads"
+  "scope": "selected local agent conversations"
 }
 ```
 

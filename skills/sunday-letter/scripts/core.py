@@ -7,11 +7,19 @@ import html
 import json
 import os
 import tempfile
+import time
+from contextlib import contextmanager
 from copy import deepcopy
 from datetime import date, datetime
 from html.parser import HTMLParser
 from pathlib import Path
-from typing import Any
+from typing import Any, Iterator
+
+try:
+    import fcntl
+except ImportError:  # Windows
+    fcntl = None  # type: ignore[assignment]
+    import msvcrt
 
 
 HERE = Path(__file__).resolve().parent
@@ -220,6 +228,39 @@ def ensure_private_directory(path: Path) -> Path:
     path.mkdir(parents=True, exist_ok=True)
     os.chmod(path, 0o700)
     return path
+
+
+@contextmanager
+def ledger_lock(path: Path) -> Iterator[None]:
+    """Serialize every read-modify-write transaction for one local ledger."""
+    ledger_path = Path(path).expanduser()
+    ensure_private_directory(ledger_path.parent)
+    lock_path = ledger_path.with_name(f".{ledger_path.name}.lock")
+    descriptor = os.open(lock_path, os.O_CREAT | os.O_RDWR, 0o600)
+    os.fchmod(descriptor, 0o600)
+    with os.fdopen(descriptor, "a+b") as handle:
+        if fcntl is not None:
+            fcntl.flock(handle.fileno(), fcntl.LOCK_EX)
+        else:  # pragma: no cover - exercised by Windows installations
+            handle.seek(0, os.SEEK_END)
+            if handle.tell() == 0:
+                handle.write(b"\0")
+                handle.flush()
+            while True:
+                try:
+                    handle.seek(0)
+                    msvcrt.locking(handle.fileno(), msvcrt.LK_NBLCK, 1)
+                    break
+                except OSError:
+                    time.sleep(0.05)
+        try:
+            yield
+        finally:
+            if fcntl is not None:
+                fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
+            else:  # pragma: no cover - exercised by Windows installations
+                handle.seek(0)
+                msvcrt.locking(handle.fileno(), msvcrt.LK_UNLCK, 1)
 
 
 def atomic_write_text(path: Path, content: str, mode: int = 0o600) -> None:
