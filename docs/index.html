@@ -93,12 +93,12 @@
     <section class="section" id="how">
       <div class="section-head">
         <div class="kicker">The actual pipeline</div>
-        <div><h2>Collection first, claims second.</h2><p>The implementation and the promise now share one path. Each stage must succeed before the next can run.</p></div>
+        <div><h2>Collection first, claims second.</h2><p>Every sentence in a letter has to survive these three stages first.</p></div>
       </div>
       <div class="steps">
-        <article class="step"><div class="num">01</div><h3>Collect and scope</h3><p>Read dated messages from local Codex or Claude Code state. Include all recent conversations or narrow to exact working directories and thread or session IDs. Redact common credential shapes before writing the bundle.</p></article>
-        <article class="step"><div class="num">02</div><h3>Validate and gate</h3><p>Extract one canonical JSON shape. Verify its scope, counts, and date window against the collector header. Reject unmeasured metrics and untraceable claims. A skip payload can never reach the renderer.</p></article>
-        <article class="step"><div class="num">03</div><h3>Render and archive</h3><p>Sanitize rich text, write the letter and signals record, atomically update the ledger, and rebuild the private local archive.</p></article>
+        <article class="step"><div class="num">01</div><h3>Collect and scope</h3><p>Read dated messages from local Codex or Claude Code state. Include all recent conversations or narrow to exact working directories and thread or session IDs. Passwords and keys are redacted before anything is written.</p></article>
+        <article class="step"><div class="num">02</div><h3>Validate and gate</h3><p>Turn the week into one structured summary and check it against what was actually collected: same sources, same counts, same dates. Claims without a source are rejected. A silent week is never rendered.</p></article>
+        <article class="step"><div class="num">03</div><h3>Render and archive</h3><p>Write the letter, update the running ledger, and rebuild your private archive. Everything stays in one folder on your machine.</p></article>
       </div>
     </section>
 
@@ -121,7 +121,7 @@
       <div class="trust-grid">
         <article class="trust-card"><h3>What it reads</h3><p>Dated user messages and final assistant answers already stored in local Codex or Claude Code conversation history. It does <strong>not</strong> independently scan arbitrary personal files.</p></article>
         <article class="trust-card"><h3>How scope works</h3><p>The default is all dated conversations in the selected window. Use <code>--cwd</code>, <code>--thread-id</code> (Codex), or <code>--session-id</code> (Claude Code) to choose a smaller source set. Undated messages are excluded by default.</p></article>
-        <article class="trust-card"><h3>What is retained</h3><p>Shipped HTML, its validated signals record, an atomic ledger, and archive metadata under <code>~/sunday-letter/</code>. Temporary transcript bundles are removed after each run.</p></article>
+        <article class="trust-card"><h3>What is retained</h3><p>The letters, their source records, and the running ledger, all under <code>~/sunday-letter/</code>. Temporary transcripts are deleted after each run.</p></article>
         <article class="trust-card"><h3>What deletion means</h3><p>Delete removes Sunday Letter artifacts. It does not erase the underlying agent conversations or unrelated agent memory. Those remain controlled by Codex or Claude Code.</p></article>
       </div>
     </section>
@@ -144,9 +144,9 @@ cd sunday-letter
         </article>
         <article class="install-card">
           <h3>Codex bundle</h3>
-          <p>Prefer a local import? Download the deterministic Codex bundle built from the same tested source.</p>
+          <p>Prefer a local import? Download the Codex bundle, built from the same tested source.</p>
           <p style="margin-top:20px"><a class="pill" href="sunday-letter-codex.plugin" download>Download v0.4.0</a></p>
-          <ul><li>Python standard library only</li><li>Private loopback archive server</li><li>Pause, Resume, Export, and Delete</li></ul>
+          <ul><li>Python standard library only</li><li>Private local archive viewer</li><li>Pause, Resume, Export, and Delete</li></ul>
         </article>
       </div>
       <p class="non-goals"><strong>Not supported yet:</strong> Cowork runtime paths, ChatGPT or Gemini installation, email or messaging delivery, remote synchronization, and cross-agent profile export.</p>
