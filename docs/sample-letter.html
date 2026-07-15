@@ -3,579 +3,244 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Letter №14 · Apr 12, 2026 · The Sunday Letter</title>
-<meta name="description" content="A weekly note from your agent. What it did. What it learned. What it retired.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+<title>Letter №1 · Apr 12, 2026 · The Sunday Letter</title>
+<meta name="description" content="A local weekly note grounded in recent Codex conversations.">
 <style>
-  :root {
-    --paper: #EEEAE0;
-    --paper-2: #E7E2D3;
-    --paper-active: #F5F1E6;
-    --paper-edge: #D8D3C3;
-    --paper-hover: #EDE8DA;
-    --sky: #DBE0E8;
+:root {
+  --paper: #eeeae0;
+  --paper-active: #f7f3e9;
+  --paper-edge: #d8d3c3;
+  --sky: #dbe0e8;
+  --ink: #1a1a1a;
+  --ink-2: #3a3a38;
+  --muted: #6b6b6b;
+  --faint: #b5b1a6;
+  --firm: #1a4c2e;
+  --soft: #8b6b1a;
+  --guess: #8b4a1a;
+  --retired: #6b1f1c;
+  --rule: rgba(26, 26, 26, 0.12);
+  --ui: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+}
 
-    --ink: #1A1A1A;
-    --ink-2: #3A3A38;
-    --ink-muted: #6B6B6B;
-    --ink-soft: #8E8C87;
-    --ink-faint: #B5B1A6;
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
 
-    --firm: #1A4C2E;
-    --firm-bg: rgba(26, 76, 46, 0.08);
-    --soft: #8B6B1A;
-    --soft-bg: rgba(139, 107, 26, 0.08);
-    --guess: #8B4A1A;
-    --guess-bg: rgba(139, 74, 26, 0.08);
-    --retired: #6B1F1C;
-    --retired-bg: rgba(107, 31, 28, 0.05);
+body {
+  min-height: 100vh;
+  color: var(--ink);
+  background: linear-gradient(180deg, var(--sky) 0, var(--paper) 240px);
+  background-attachment: fixed;
+  font: 15px/1.6 var(--ui);
+  -webkit-font-smoothing: antialiased;
+}
 
-    --rule: rgba(26, 26, 26, 0.10);
-    --rule-strong: rgba(26, 26, 26, 0.20);
-    --shadow-sm: 0 1px 2px rgba(26, 26, 26, 0.06);
-    --shadow-md: 0 4px 16px rgba(26, 26, 26, 0.08);
-    --shadow-lg: 0 20px 60px rgba(26, 26, 26, 0.12);
+a { color: inherit; }
 
-    --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    --font-mono: 'JetBrains Mono', ui-monospace, 'Menlo', monospace;
-  }
+.topbar {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin: 0 auto;
+  max-width: 1100px;
+  padding: 22px 40px;
+}
 
-  * { box-sizing: border-box; }
-  html, body { margin: 0; padding: 0; }
-  html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+.wordmark {
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
 
-  body {
-    min-height: 100vh;
-    background:
-      linear-gradient(180deg, var(--sky) 0%, var(--paper) 220px, var(--paper) 100%);
-    background-attachment: fixed;
-    font-family: var(--font-ui);
-    color: var(--ink);
-    line-height: 1.55;
-    font-size: 15px;
-  }
+.wordmark .dot {
+  background: var(--firm);
+  border-radius: 50%;
+  display: inline-block;
+  height: 7px;
+  margin-right: 8px;
+  width: 7px;
+}
 
-  /* ---------- TOP BAR ---------- */
-  .topbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 22px 40px;
-    max-width: 1100px;
-    margin: 0 auto;
-  }
-  .wordmark {
-    font-family: var(--font-ui);
-    font-weight: 700;
-    font-size: 14px;
-    letter-spacing: -0.01em;
-    color: var(--ink);
-    text-decoration: none;
-  }
-  .wordmark .dot {
-    display: inline-block;
-    width: 7px;
-    height: 7px;
-    background: var(--firm);
-    border-radius: 50%;
-    margin-right: 8px;
-    vertical-align: middle;
-    transform: translateY(-1px);
-  }
-  .meta-right {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--ink-muted);
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    display: flex;
-    gap: 18px;
-  }
-  .meta-right .dot {
-    display: inline-block;
-    width: 6px;
-    height: 6px;
-    background: var(--ink-faint);
-    border-radius: 50%;
-    margin: 0 6px 1px 0;
-    vertical-align: middle;
-  }
+.meta-right {
+  color: var(--muted);
+  display: flex;
+  font: 11px/1 var(--mono);
+  gap: 18px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
 
-  /* ---------- CONTAINER ---------- */
-  .container {
-    max-width: 760px;
-    margin: 0 auto;
-    padding: 24px 40px 80px;
-  }
+.container { margin: 0 auto; max-width: 760px; padding: 24px 40px 80px; }
 
-  /* ---------- NOTE CARD ---------- */
-  .note {
-    background: var(--paper-active);
-    border: 1px solid var(--paper-edge);
-    border-radius: 14px;
-    box-shadow: var(--shadow-lg);
-    padding: 56px 64px 48px;
-    animation: rise 0.5s ease both;
-  }
+.note {
+  background: var(--paper-active);
+  border: 1px solid var(--paper-edge);
+  border-radius: 14px;
+  box-shadow: 0 20px 60px rgba(26, 26, 26, .12);
+  padding: 56px 64px 48px;
+}
 
-  @keyframes rise {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .note { animation: none; }
-  }
+.note-meta {
+  align-items: flex-start;
+  border-bottom: 1px solid var(--rule);
+  color: var(--muted);
+  display: flex;
+  font: 10px/1.5 var(--mono);
+  justify-content: space-between;
+  letter-spacing: .04em;
+  padding-bottom: 22px;
+  text-transform: uppercase;
+}
 
-  .note-meta {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding-bottom: 24px;
-    border-bottom: 1px solid var(--rule);
-    margin-bottom: 32px;
-  }
-  .note-meta-left {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--ink-muted);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-  }
-  .note-meta-left .num {
-    color: var(--ink);
-    font-weight: 600;
-  }
-  .note-meta-right {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--ink-soft);
-    letter-spacing: 0.04em;
-  }
+.note-meta-right { max-width: 48%; text-align: right; }
+.num { color: var(--ink); font-weight: 600; }
 
-  .note-title {
-    font-family: var(--font-ui);
-    font-size: 36px;
-    line-height: 1.15;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    color: var(--ink);
-    margin: 0 0 12px;
-  }
-  .note-lede {
-    font-family: var(--font-ui);
-    font-size: 16px;
-    line-height: 1.6;
-    color: var(--ink-2);
-    margin: 0 0 40px;
-    max-width: 60ch;
-  }
-  .note-lede em {
-    font-style: italic;
-    color: var(--ink);
-  }
+.note-title {
+  font-size: clamp(30px, 5vw, 46px);
+  letter-spacing: -.04em;
+  line-height: 1.08;
+  margin: 44px 0 20px;
+}
 
-  /* ---------- SECTIONS ---------- */
-  .section {
-    margin: 36px 0;
-  }
-  .section-head {
-    display: flex;
-    align-items: baseline;
-    gap: 14px;
-    margin-bottom: 18px;
-  }
-  .section-num {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--ink-soft);
-    letter-spacing: 0.08em;
-    font-weight: 500;
-    min-width: 24px;
-  }
-  .section-title {
-    font-family: var(--font-ui);
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--ink-muted);
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    margin: 0;
-  }
+.note-lede { color: var(--ink-2); font-size: 18px; line-height: 1.65; margin: 0 0 52px; }
+.section { border-top: 1px solid var(--rule); padding: 38px 0; }
+.section-head { align-items: baseline; display: flex; gap: 14px; margin-bottom: 26px; }
 
-  /* ---------- CONSEQUENCES (numbered list) ---------- */
-  .csq-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    counter-reset: csq;
-  }
-  .csq {
-    counter-increment: csq;
-    display: grid;
-    grid-template-columns: 36px 1fr;
-    gap: 12px;
-    padding: 16px 0;
-    border-bottom: 1px solid var(--rule);
-  }
-  .csq:last-child { border-bottom: none; }
-  .csq::before {
-    content: counter(csq, decimal-leading-zero);
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--ink-faint);
-    letter-spacing: 0.06em;
-    padding-top: 4px;
-  }
-  .csq-tag {
-    display: inline-block;
-    font-family: var(--font-mono);
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 0.10em;
-    text-transform: uppercase;
-    color: var(--firm);
-    background: var(--firm-bg);
-    padding: 3px 8px;
-    border-radius: 3px;
-    margin-bottom: 8px;
-  }
-  .csq-title {
-    font-family: var(--font-ui);
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--ink);
-    line-height: 1.4;
-    margin: 0 0 4px;
-  }
-  .csq-body {
-    font-size: 14px;
-    color: var(--ink-2);
-    margin: 0 0 8px;
-    line-height: 1.55;
-  }
-  .csq-because {
-    font-size: 13px;
-    color: var(--ink-muted);
-    line-height: 1.5;
-    border-left: 2px solid var(--rule);
-    padding-left: 10px;
-    margin-top: 6px;
-  }
+.section-num, .question-label {
+  color: var(--muted);
+  font: 10px/1 var(--mono);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
 
-  /* ---------- OBSERVATIONS (with calibration badges) ---------- */
-  .obs {
-    padding: 18px 0;
-    border-bottom: 1px solid var(--rule);
-  }
-  .obs:last-child { border-bottom: none; }
-  .obs-head {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
-    flex-wrap: wrap;
-  }
-  .badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    font-family: var(--font-mono);
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 0.10em;
-    text-transform: uppercase;
-    padding: 3px 8px;
-    border-radius: 3px;
-    white-space: nowrap;
-  }
-  .badge.firm { color: var(--firm); background: var(--firm-bg); }
-  .badge.soft { color: var(--soft); background: var(--soft-bg); }
-  .badge.guess { color: var(--guess); background: var(--guess-bg); }
-  .obs-when {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--ink-soft);
-    letter-spacing: 0.04em;
-  }
-  .obs-title {
-    font-family: var(--font-ui);
-    font-size: 17px;
-    font-weight: 600;
-    color: var(--ink);
-    line-height: 1.4;
-    margin: 0 0 8px;
-    letter-spacing: -0.01em;
-  }
-  .obs-body {
-    font-size: 14px;
-    color: var(--ink-2);
-    line-height: 1.6;
-    margin: 0 0 12px;
-  }
-  .obs-evidence {
-    font-size: 13px;
-    color: var(--ink-muted);
-    line-height: 1.55;
-    border-left: 2px solid var(--ink-faint);
-    padding: 6px 12px;
-    background: rgba(255, 255, 255, 0.35);
-    border-radius: 0 4px 4px 0;
-    font-style: italic;
-  }
-  .obs-evidence::before {
-    content: "Evidence  ";
-    font-family: var(--font-mono);
-    font-size: 10px;
-    font-style: normal;
-    font-weight: 600;
-    color: var(--ink-faint);
-    letter-spacing: 0.10em;
-    text-transform: uppercase;
-    margin-right: 4px;
-  }
-  .obs-prov {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    color: var(--ink-faint);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    margin-top: 8px;
-  }
+.section-title { font-size: 19px; letter-spacing: -.02em; margin: 0; }
+.csq-list { list-style: none; margin: 0; padding: 0; }
+.csq { border-bottom: 1px solid var(--rule); padding: 0 0 24px; }
+.csq + .csq { padding-top: 24px; }
+.csq:last-child { border-bottom: 0; padding-bottom: 0; }
 
-  /* ---------- RETIRED ---------- */
-  .retired-card {
-    background: var(--retired-bg);
-    border-left: 3px solid var(--retired);
-    border-radius: 0 6px 6px 0;
-    padding: 18px 20px;
-    margin-bottom: 12px;
-  }
-  .retired-old {
-    font-family: var(--font-ui);
-    font-size: 15px;
-    font-weight: 500;
-    color: var(--ink-muted);
-    text-decoration: line-through;
-    text-decoration-color: var(--retired);
-    text-decoration-thickness: 1.5px;
-    margin: 0 0 10px;
-  }
-  .retired-arrow {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--retired);
-    letter-spacing: 0.10em;
-    text-transform: uppercase;
-    font-weight: 600;
-    margin-bottom: 8px;
-  }
-  .retired-why {
-    font-size: 14px;
-    color: var(--ink-2);
-    line-height: 1.6;
-    margin: 0;
-  }
-  .retired-why strong { color: var(--ink); font-weight: 600; }
+.csq-tag {
+  color: var(--firm);
+  font: 600 10px/1 var(--mono);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
 
-  /* ---------- GAP ---------- */
-  .gap-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0;
-    border: 1px solid var(--rule);
-    border-radius: 6px;
-    overflow: hidden;
-  }
-  .gap-cell {
-    padding: 18px 20px;
-  }
-  .gap-cell + .gap-cell {
-    border-left: 1px solid var(--rule);
-  }
-  .gap-label {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    color: var(--ink-faint);
-    letter-spacing: 0.10em;
-    text-transform: uppercase;
-    margin-bottom: 8px;
-  }
-  .gap-value {
-    font-family: var(--font-ui);
-    font-size: 15px;
-    font-weight: 500;
-    color: var(--ink);
-    line-height: 1.4;
-    margin: 0 0 6px;
-  }
-  .gap-count {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--ink-soft);
-    letter-spacing: 0.04em;
-  }
-  @media (max-width: 600px) {
-    .gap-grid { grid-template-columns: 1fr; }
-    .gap-cell + .gap-cell { border-left: none; border-top: 1px solid var(--rule); }
-  }
+.csq-title, .obs-title { font-size: 16px; margin: 8px 0 7px; }
+.csq-body, .obs-body { color: var(--ink-2); margin: 0; }
+.csq-because, .obs-evidence { color: var(--muted); font-size: 13px; margin-top: 10px; }
+.obs { border-bottom: 1px solid var(--rule); padding: 0 0 24px; }
+.obs + .obs { padding-top: 24px; }
+.obs:last-child { border-bottom: 0; }
+.obs-head { align-items: center; display: flex; gap: 8px; }
+.obs-when { color: var(--muted); font: 10px/1 var(--mono); }
 
-  /* ---------- BECOMING ---------- */
-  .becoming-card {
-    border: 1px solid var(--rule);
-    border-radius: 6px;
-    padding: 20px 22px;
-    background: rgba(255, 255, 255, 0.30);
-  }
-  .becoming-title {
-    font-family: var(--font-ui);
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--ink);
-    margin: 0 0 10px;
-    letter-spacing: -0.01em;
-  }
-  .becoming-body {
-    font-size: 14px;
-    color: var(--ink-2);
-    line-height: 1.6;
-    margin: 0;
-  }
-  .becoming-body em { font-style: italic; color: var(--ink); }
+.badge {
+  border-radius: 999px;
+  display: inline-block;
+  font: 600 9px/1 var(--mono);
+  letter-spacing: .06em;
+  padding: 5px 8px;
+  text-transform: uppercase;
+}
 
-  /* ---------- QUESTION ---------- */
-  .question-block {
-    border-top: 1px solid var(--rule-strong);
-    margin-top: 48px;
-    padding-top: 32px;
-  }
-  .question-label {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    color: var(--ink-faint);
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    margin-bottom: 14px;
-  }
-  .question {
-    font-family: var(--font-ui);
-    font-size: 22px;
-    font-weight: 500;
-    color: var(--ink);
-    line-height: 1.4;
-    letter-spacing: -0.015em;
-    margin: 0 0 14px;
-    max-width: 56ch;
-  }
-  .question strong { font-weight: 700; color: var(--ink); }
-  .question-note {
-    font-size: 13px;
-    color: var(--ink-muted);
-    line-height: 1.55;
-    margin: 0;
-    max-width: 56ch;
-    font-style: italic;
-  }
+.badge.firm { background: rgba(26, 76, 46, .09); color: var(--firm); }
+.badge.soft { background: rgba(139, 107, 26, .09); color: var(--soft); }
+.badge.guess { background: rgba(139, 74, 26, .09); color: var(--guess); }
 
-  /* ---------- CLOSE ---------- */
-  .note-close {
-    border-top: 1px solid var(--rule);
-    margin-top: 48px;
-    padding-top: 28px;
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 16px;
-  }
-  .signoff {
-    font-size: 14px;
-    color: var(--ink-2);
-    line-height: 1.5;
-  }
-  .signoff-line {
-    color: var(--ink-muted);
-    margin-bottom: 4px;
-  }
-  .sig-name {
-    font-family: var(--font-ui);
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--ink);
-    letter-spacing: -0.01em;
-  }
-  .close-mark {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--ink-faint);
-    letter-spacing: 0.40em;
-  }
+.obs-prov {
+  color: var(--muted);
+  font: 10px/1.45 var(--mono);
+  margin-top: 10px;
+  overflow-wrap: anywhere;
+}
 
-  /* ---------- FOOTER LINKS ---------- */
-  .note-foot {
-    margin-top: 32px;
-    padding-top: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-  .note-foot-left {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--ink-soft);
-    letter-spacing: 0.04em;
-  }
-  .note-foot-right a {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--ink-muted);
-    text-decoration: none;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    margin-left: 16px;
-    transition: color 0.15s;
-  }
-  .note-foot-right a:hover { color: var(--ink); }
+.retired-card, .becoming-card {
+  background: rgba(107, 31, 28, .05);
+  border-left: 3px solid var(--retired);
+  border-radius: 0 8px 8px 0;
+  padding: 20px 22px;
+}
 
-  /* ---------- RESPONSIVE ---------- */
-  @media (max-width: 720px) {
-    .topbar { padding: 18px 20px; }
-    .container { padding: 16px 16px 60px; }
-    .note { padding: 32px 24px 32px; border-radius: 10px; }
-    .note-title { font-size: 28px; }
-    .question { font-size: 19px; }
-    .csq { grid-template-columns: 28px 1fr; gap: 8px; }
-  }
+.retired-card + .retired-card { margin-top: 14px; }
+.retired-old { color: var(--muted); margin: 0; text-decoration: line-through; }
+.retired-arrow { color: var(--retired); font: 10px/1 var(--mono); margin: 13px 0 8px; text-transform: uppercase; }
+.retired-why, .becoming-body { margin: 0; }
+
+.gap-grid { display: grid; gap: 1px; grid-template-columns: 1fr 1fr; }
+.gap-cell { background: rgba(26, 26, 26, .04); padding: 20px; }
+.gap-label { color: var(--muted); font: 10px/1 var(--mono); text-transform: uppercase; }
+.gap-value { font-weight: 600; margin: 10px 0 14px; }
+.gap-count { color: var(--muted); font-size: 12px; }
+.becoming-card { background: rgba(26, 76, 46, .06); border-color: var(--firm); }
+.becoming-title { margin: 0 0 8px; }
+
+.question-block {
+  background: var(--ink);
+  border-radius: 9px;
+  color: white;
+  margin-top: 12px;
+  padding: 28px 30px;
+}
+
+.question-label { color: rgba(255, 255, 255, .58); }
+.question { font-size: 19px; line-height: 1.5; margin: 14px 0 0; }
+.question-note { color: rgba(255, 255, 255, .66); font-size: 12px; margin: 12px 0 0; }
+.note-close { align-items: flex-end; display: flex; justify-content: space-between; padding: 44px 0 34px; }
+.signoff-line { color: var(--muted); font-size: 13px; }
+.sig-name { font-weight: 600; margin-top: 4px; }
+.close-mark { color: var(--faint); letter-spacing: .2em; }
+
+.note-foot {
+  border-top: 1px solid var(--rule);
+  color: var(--muted);
+  display: flex;
+  font: 10px/1.4 var(--mono);
+  justify-content: space-between;
+  padding-top: 20px;
+  text-transform: uppercase;
+}
+
+.note-foot-right { display: flex; gap: 18px; }
+.note-foot-right a { text-decoration: none; }
+.note-foot-right a:hover { text-decoration: underline; }
+
+@media (max-width: 680px) {
+  .topbar { padding: 18px 20px; }
+  .meta-right span:first-child { display: none; }
+  .container { padding: 12px 12px 48px; }
+  .note { border-radius: 10px; padding: 34px 24px 28px; }
+  .note-meta { display: block; }
+  .note-meta-right { margin-top: 8px; max-width: none; text-align: left; }
+  .note-title { margin-top: 32px; }
+  .gap-grid { grid-template-columns: 1fr; }
+  .note-foot { align-items: flex-start; flex-direction: column; gap: 14px; }
+}
+
+@media print {
+  body { background: white; }
+  .topbar { display: none; }
+  .container { max-width: none; padding: 0; }
+  .note { border: 0; box-shadow: none; padding: 0; }
+}
+
 </style>
 </head>
 <body>
-
 <header class="topbar">
-  <a class="wordmark" href="#"><span class="dot"></span>The Sunday Letter</a>
-  <div class="meta-right">
-    <span><span class="dot"></span>Letter №14</span>
-    <span>Apr 12, 2026</span>
-  </div>
+  <span class="wordmark"><span class="dot"></span>The Sunday Letter</span>
+  <div class="meta-right"><span>Letter №1</span><span>Apr 12, 2026</span></div>
 </header>
-
 <main class="container">
   <article class="note">
-
     <div class="note-meta">
-      <div class="note-meta-left">
-        <span class="num">№14</span> &nbsp;·&nbsp; Apr 12, 2026 &nbsp;·&nbsp; for Teddy
-      </div>
-      <div class="note-meta-right">
-        Calibration 81% · 6 signals
-      </div>
+      <div class="note-meta-left"><span class="num">№1</span> · Apr 12, 2026 · for Teddy</div>
+      <div class="note-meta-right">5 threads · 23 messages · 2026-04-06T00:00:00Z → 2026-04-12T23:59:59Z</div>
     </div>
-
     <h1 class="note-title">Three wheels, one retirement.</h1>
-    <p class="note-lede">Short version: this week I <em>did three things for you</em>, retired one belief I used to hold about you (I was wrong about the pickling), and noticed your stance shifting on one thing that genuinely matters. There's also one real question I'd like to sit with you on. <em>Reply by voice memo at any point, I'll pick it up.</em></p>
-
+    <p class="note-lede">This week I <strong>finished three concrete things</strong>, retired one belief I used to hold, and found one pattern worth checking rather than declaring.</p>
     
     <section class="section">
       <div class="section-head">
@@ -583,147 +248,143 @@
         <h2 class="section-title">What I did this week</h2>
       </div>
       <ol class="csq-list">
-        
         <li class="csq">
           <div>
             <span class="csq-tag">Drafted</span>
-            <h3 class="csq-title">3 polite declines to shop-tour requests, ready to send.</h3>
-            <p class="csq-body">Two tourists (Spain, Japan), one food blogger. All worded to preserve the relationship but close the door.</p>
-            <div class="csq-because">Because you've told me four times you want no interruptions on affinage days.</div>
+            <h3 class="csq-title">Three polite declines to shop-tour requests, ready to review.</h3>
+            <p class="csq-body">Two tourists and one food blogger. Each reply preserves the relationship while closing the door.</p>
+            <div class="csq-because">You have repeatedly protected affinage days from interruptions.</div>
+            <div class="obs-prov">Apr 10 · shop operations thread</div>
           </div>
         </li>
-        
         <li class="csq">
           <div>
             <span class="csq-tag">Shortlisted</span>
-            <h3 class="csq-title">4 cheese competitions in Europe, down from 29.</h3>
-            <p class="csq-body">Filtered out anything that collides with Tuesday deliveries and anything billed as "networking."</p>
-            <div class="csq-because">Your revealed preference: never close the shop on a Tuesday, ever.</div>
+            <h3 class="csq-title">Four European cheese competitions, down from twenty-nine.</h3>
+            <p class="csq-body">Anything colliding with Tuesday deliveries or centered on networking was removed.</p>
+            <div class="csq-because">Tuesday delivery work has stayed non-negotiable across the selected conversations.</div>
+            <div class="obs-prov">Apr 9 · competition research thread</div>
           </div>
         </li>
-        
         <li class="csq">
           <div>
-            <span class="csq-tag">Blocked</span>
-            <h3 class="csq-title">Cousin Martin&#39;s &#34;come tour a goat farm&#34; invite, politely declined.</h3>
-            <p class="csq-body">Offered him a 20-minute phone call instead. He accepted. Everyone is fine.</p>
-            <div class="csq-because">You've kept exactly one day off per week for eight months. I'm learning to protect it.</div>
+            <span class="csq-tag">Routed</span>
+            <h3 class="csq-title">Cousin Martin&#x27;s farm invitation became a twenty-minute call.</h3>
+            <p class="csq-body">The visit remains open without consuming the only protected day off.</p>
+            <div class="csq-because">You asked for a smaller commitment after rescheduling the visit four times.</div>
+            <div class="obs-prov">Apr 8 · weekly planning thread</div>
           </div>
-        </li>
-        
-      </ol>
+        </li></ol>
     </section>
-    
-
-    
     <section class="section">
       <div class="section-head">
         <span class="section-num">02</span>
-        <h2 class="section-title">What I learned about you</h2>
+        <h2 class="section-title">Decisions and open loops</h2>
       </div>
-      
-      <div class="obs">
-        <div class="obs-head">
-          <span class="badge firm">Fairly sure</span>
-          <span class="obs-when">· learned Apr 12</span>
-        </div>
-        <h3 class="obs-title">You say you want &#34;simple, approachable&#34; posts but write 800-word essays on obscure Alpine rinds.</h3>
-        <p class="obs-body">Nine posts measured between Feb 3 and Apr 10. The engagement pattern held every time: your readers stayed 3.2× longer with the deeper pieces.</p>
-        <div class="obs-evidence">keep it short, I want to write for people who aren't cheese people (Mar 14), followed by a 1,100-word deep dive on Vacherin two days later</div>
-        <div class="obs-prov">Apr 10 · 9:14 PM · strongest signal this week</div>
-      </div>
-      
-      <div class="obs">
-        <div class="obs-head">
-          <span class="badge soft">A guess, still checking</span>
-          <span class="obs-when">· noticed three times in six weeks</span>
-        </div>
-        <h3 class="obs-title">You&#39;re drawn to critics who are a little unpleasant.</h3>
-        <p class="obs-body">When a reviewer called a cheese "a journey," you were annoyed. When one called it "overrated and oily," you bookmarked the piece and reread it twice.</p>
-        <div class="obs-evidence">I want someone to tell me this is overrated, not that it's a journey (Apr 9)</div>
-        <div class="obs-prov">Feb 28 → Apr 9 · three instances, different critics</div>
-      </div>
-      
+      <ol class="csq-list">
+        <li class="csq">
+          <div>
+            <span class="csq-tag">Decision</span>
+            <h3 class="csq-title">Newsletter growth is not the current objective.</h3>
+            <p class="csq-body">The working strategy is a smaller, more attentive readership rather than broad acquisition.</p>
+            <div class="obs-prov">Apr 11 · newsletter strategy thread</div>
+          </div>
+        </li>
+        <li class="csq">
+          <div>
+            <span class="csq-tag">Open loop</span>
+            <h3 class="csq-title">Choose whether to enter one shortlisted competition.</h3>
+            <p class="csq-body">The shortlist is ready; the remaining decision is whether any entry deserves the time.</p>
+            <div class="csq-because">Owner: Teddy</div>
+            <div class="obs-prov">Apr 9 · competition research thread</div>
+          </div>
+        </li></ol>
     </section>
-    
-
-    
     <section class="section">
       <div class="section-head">
         <span class="section-num">03</span>
-        <h2 class="section-title">What I retired</h2>
+        <h2 class="section-title">What I learned about you</h2>
       </div>
-      
-      <div class="retired-card">
-        <p class="retired-old">Teddy wants to grow his newsletter.</p>
-        <div class="retired-arrow">→ Replaced because</div>
-        <p class="retired-why">I held this for 5 weeks. It was wrong. You've been quietly unsubscribing readers who email you photos of cheese plates. You want <strong>fewer, sharper readers</strong>, not growth. I'm replacing it with: <strong>curated, opinionated, small.</strong></p>
+      <div class="obs">
+        <div class="obs-head">
+          <span class="badge firm">Fairly sure</span>
+          <span class="obs-when">· Apr 12</span>
+        </div>
+        <h3 class="obs-title">Your deeper cheese essays are not an accidental exception.</h3>
+        <p class="obs-body">The preference for short writing did not hold when you reviewed the pieces you were proudest of.</p>
+        <div class="obs-evidence">You asked to keep the writing approachable, then spent three revisions protecting the technical detail in the Vacherin draft.</div>
+        <div class="obs-prov">Apr 10 · Vacherin draft thread · six consistent signals</div>
       </div>
-      
+      <div class="obs">
+        <div class="obs-head">
+          <span class="badge soft">Still checking</span>
+          <span class="obs-when">· Apr 12</span>
+        </div>
+        <h3 class="obs-title">You may prefer critics who are blunt enough to be useful.</h3>
+        <p class="obs-body">The pattern appears across three conversations, but it may be specific to cheese criticism.</p>
+        <div class="obs-evidence">You rejected 'a journey' and kept the reviewer you described as 'grumpy and correct.'</div>
+        <div class="obs-prov">Apr 7–10 · criticism threads · three signals</div>
+      </div>
     </section>
-    
-
-    
     <section class="section">
       <div class="section-head">
         <span class="section-num">04</span>
+        <h2 class="section-title">What I retired</h2>
+      </div>
+      <div class="retired-card">
+        <p class="retired-old">Teddy wants to grow the newsletter.</p>
+        <div class="retired-arrow">→ Replaced because</div>
+        <p class="retired-why">That was wrong. The better model is <strong>curated, opinionated, small</strong>: fewer readers, more attention, no growth-hack suggestions.</p>
+        <div class="obs-prov">Apr 11 · newsletter strategy thread</div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="section-head">
+        <span class="section-num">05</span>
         <h2 class="section-title">The gap (stated vs. revealed)</h2>
       </div>
       <div class="gap-grid">
         <div class="gap-cell">
           <div class="gap-label">You said</div>
           <p class="gap-value">I should write shorter posts.</p>
-          <div class="gap-count">Said this three times since March.</div>
+          <div class="gap-count">Said three times in the selected window.</div>
         </div>
         <div class="gap-cell">
           <div class="gap-label">You did</div>
-          <p class="gap-value">Engaged 4× longer with posts over 700 words.</p>
-          <div class="gap-count">Based on 22 interactions.</div>
+          <p class="gap-value">Protected depth and technical detail through repeated revisions.</p>
+          <div class="gap-count">Observed in four editing sequences.</div>
         </div>
       </div>
+      <div class="obs-prov">Apr 6–12 · selected writing threads</div>
     </section>
-    
-
-    
     <section class="section">
       <div class="section-head">
-        <span class="section-num">05</span>
-        <h2 class="section-title">What you're becoming</h2>
+        <span class="section-num">06</span>
+        <h2 class="section-title">What you&#x27;re becoming</h2>
       </div>
       <div class="becoming-card">
-        <h3 class="becoming-title">From &#34;hobbyist newsletter&#34; to &#34;actual critic&#34;</h3>
-        <p class="becoming-body">You've asked me about press credentials for the World Cheese Awards three weeks running. You didn't used to. You also started drafting a post titled <em>"Why the affinage category is rigged"</em>, and then deleted it. Worth naming before it crystallizes: is this a direction you want to lean into, or one you want me to pull you back from?</p>
+        <h3 class="becoming-title">From hobbyist newsletter to working critic</h3>
+        <p class="becoming-body">Questions about credentials, judging, and category definitions are appearing more often. The direction is visible, but it is not yet a conclusion.</p>
+        <div class="obs-prov">Apr 6–12 · three selected threads</div>
       </div>
     </section>
-    
-
-    
     <section class="question-block">
-      <div class="question-label">06 · One question</div>
-      <p class="question">You keep bookmarking articles about moving to France for "a year or two." Is that a <strong>plan you're working toward</strong>, or a <strong>way of not committing to the shop you already have</strong>? The answer probably changes what I should be helping with.</p>
-      <p class="question-note">No need to reply now. Voice-memo a stray thought this week and I&#39;ll hold it until next Sunday.</p>
+      <div class="question-label">07 · One question</div>
+      <p class="question">Are the World Cheese Awards a direction you want to pursue, or only a possibility you want to keep available?</p>
+      <p class="question-note">No need to answer immediately.</p>
     </section>
-    
-
     <div class="note-close">
       <div class="signoff">
-        <div class="signoff-line">Much love,</div>
-        <div class="sig-name">Claude</div>
+        <div class="signoff-line">Until next week,</div>
+        <div class="sig-name">your attentive agent</div>
       </div>
       <div class="close-mark">× × ×</div>
     </div>
-
     <div class="note-foot">
-      <div class="note-foot-left">23 conversations · 11 hours saved · 3 exports</div>
-      <div class="note-foot-right">
-        <a href="#">Pause</a>
-        <a href="#">Export</a>
-        <a href="#">Archive</a>
-      </div>
+      <div class="note-foot-left">Local Codex sources only</div>
+      <div class="note-foot-right"><a href="sample-letter.html" download>Export HTML</a></div>
     </div>
-
   </article>
 </main>
-
 </body>
 </html>

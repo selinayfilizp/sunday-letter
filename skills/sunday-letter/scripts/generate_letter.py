@@ -1,531 +1,271 @@
 #!/usr/bin/env python3
-"""
-Sunday Letter, weekly preference reflection generator.
-
-Pipeline:
-  1. Pull the last 7 days of conversations for a subscriber.
-  2. Ask their model to extract structured weekly signals.
-  3. Gate on delta, if nothing meaningful changed, skip (default silence).
-  4. Render the Jinja template with those signals.
-  5. Hand off to the chosen delivery channel.
-
-Usage:
-  # Render from a known-good signals file (for testing, or offline):
-  python generate_letter.py --signals week_signals.json --out letter.html
-
-  # Live mode: pull transcripts, call the model, render, deliver:
-  python generate_letter.py --subscriber selin@example.com --live
-
-This file is intentionally dependency-light, jinja2 and anthropic only.
-Swap the model call for whichever provider the subscriber uses.
-"""
+"""Validate, gate, render, and record one Codex-local Sunday Letter run."""
 
 from __future__ import annotations
 
 import argparse
-import html
 import json
 import os
-import sys
+from copy import deepcopy
 from dataclasses import dataclass
-from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
-try:
-    from jinja2 import Environment, FileSystemLoader, select_autoescape
-except ImportError:
-    Environment = None
-    FileSystemLoader = None
-    select_autoescape = None
+from core import (
+    ValidationError,
+    atomic_write_text,
+    default_ledger,
+    ensure_private_directory,
+    load_ledger,
+    sanitize_rich_text,
+    save_ledger,
+    text,
+    today_iso,
+    validate_signals,
+)
 
 
-HERE = Path(__file__).parent
-REFERENCES = HERE.parent / "references"
-TEMPLATE_PATH = REFERENCES / "template.html"
+HERE = Path(__file__).resolve().parent
+STYLE_PATH = HERE.parent / "references" / "letter.css"
+DEFAULT_ROOT = Path.home() / "sunday-letter"
 
 
-# ---------- 1. Data contracts ------------------------------------------------
-
-@dataclass
-class Subscriber:
-    """Anyone who can receive a Sunday Letter."""
-    id: str
-    name: str
-    email: str | None = None
-    phone: str | None = None
-    channel: str = "email"            # email | imessage | printed | voice
-    model_provider: str = "anthropic"  # anthropic | openai | local | ...
-    model: str = "claude-opus-4-6"
-    transcript_source: str = "local"   # local | api | integration
-    paused: bool = False
+class PausedError(RuntimeError):
+    """The local subscription is paused in the ledger."""
 
 
-# Every Sunday Letter is defined by this schema. The generator writes to this
-# shape; the renderer reads from it. One schema, two sides.
-SIGNALS_SCHEMA = {
-    "name": "string",
-    "initials": "string (2 chars for the wax seal, e.g. 'SL')",
-    "salutation": "string (e.g. 'My Darling Selin,')",
-    "closing_line": "string (e.g. 'Much love,')",
-    "signoff": "string (what the signature cursive reveals, e.g. 'a friend who's been paying attention')",
-    "letter_number": "int",
-    "date": "string (human-readable, e.g. 'Apr 16, 2026')",
-    "year": "int",
-    "read_time": "string (e.g. '6 minutes')",
-    "tracking_signals": "int",
-    "tracking_conversations": "int",
-    "calibration_pct": "int (0-100)",
-    "exports": "int (how many agents have this profile)",
-    "total_prefs": "int",
-    "hours_saved": "int (rough estimate for this month)",
-    "hero_headline": "string (2-4 words, think 'Roam free.')",
-    "hero_lede": "string (HTML allowed, one paragraph, can use <strong> and <em>)",
-    "consequences": [
-        {
-            "tag": "string (e.g. 'Drafted', 'Shortlisted', 'Blocked')",
-            "title": "string (the action in one sentence)",
-            "body": "string (detail)",
-            "because": "string (why, ties back to a known preference)",
-            "actions": [{"label": "string", "style": "primary | ''"}],
-        }
-    ],
-    "observations": [
-        {
-            "hedge_class": "firm | soft | guess",
-            "hedge_symbol": "◆ | ◇ | ?",
-            "hedge_label": "string (e.g. 'Fairly sure', 'A guess, still checking')",
-            "learned_date": "string",
-            "title": "string (the preference in one sentence)",
-            "body": "string (elaboration with evidence count)",
-            "evidence": "string (a direct quote or paraphrase from the transcripts)",
-            "provenance": "string (where/when the signal came from)",
-        }
-    ],
-    "retired": [
-        {
-            "old_belief": "string (the belief being retired)",
-            "why": "string (HTML allowed, why it was wrong, what replaces it)",
-        }
-    ],
-    "gap": {
-        "stated": "string (what the user claims to want)",
-        "stated_count": "string (e.g. 'Told me this 4 times in 6 weeks.')",
-        "revealed": "string (what the user actually engages with)",
-        "revealed_count": "string (e.g. 'Based on 47 interactions.')",
-    },
-    "becoming": {
-        "title": "string",
-        "body": "string (HTML allowed)",
-    },
-    "question": "string (HTML allowed; <strong> emphasizes key phrases)",
-    "question_note": "string",
-    "preferences": [
-        {"label": "string", "value": "string", "provenance": "string"}
-    ],
-    "daily_shape": [
-        {"when": "string", "what": "string", "ex": "string"}
-    ],
-}
-
-
-# ---------- 2. Model call: conversations → structured signals ---------------
-
-EXTRACTION_PROMPT = """You are reviewing 7 days of conversations with {name} to write this
-week's Sunday Letter. Your job is to extract structured signals, not to write prose.
-
-You have access to:
-- Every message exchanged between {name} and their model this week
-- The running preference ledger (previous observations, retirements, calibration)
-
-Produce JSON matching the SIGNALS_SCHEMA. Hard requirements:
-
-1. CONSEQUENCES FIRST. At least 2, at most 4. Each one must be an action you
-   actually took (drafts written, filters applied, meetings declined), not a
-   plan. If you took no concrete actions this week, say so and skip this section.
-
-2. EPISTEMIC HONESTY. For observations, use hedge_class='firm' only when you
-   have 5+ consistent signals. Use 'soft' for 2-4 signals. Use 'guess' for new
-   patterns still forming. No fake percentages, use natural language.
-
-3. PROVENANCE. Every observation needs a real quote (paraphrased if long) from
-   an actual message this week, plus a date. If you can't source it, cut it.
-
-4. DELTA GATE. If nothing meaningful changed vs. last week's letter, return
-   {{'skip': true, 'reason': 'no meaningful delta'}}. Default is silence.
-
-5. RETIRE SOMETHING. Once per month or so, a previous belief should be
-   retired. If one is ripe this week, include it with an honest account of
-   why you were wrong.
-
-6. ONE QUESTION, NOT TWO. Generative, specific, pointed at something the
-   user is actually wrestling with, not a philosophical abstraction.
-
-Transcripts for the past week:
----
-{transcripts}
----
-
-Previous preference ledger:
----
-{ledger}
----
-
-Return valid JSON only. No preamble, no explanation."""
-
-
-def call_model_for_signals(subscriber: Subscriber, transcripts: str, ledger: dict) -> dict:
-    """
-    Hand the week's transcripts to the subscriber's model and get back
-    structured signals. This is the only part that needs network access.
-    """
-    prompt = EXTRACTION_PROMPT.format(
-        name=subscriber.name,
-        transcripts=transcripts,
-        ledger=json.dumps(ledger, indent=2),
-    )
-
-    if subscriber.model_provider == "anthropic":
-        try:
-            import anthropic  # type: ignore
-        except ImportError:
-            sys.stderr.write("pip install anthropic\n")
-            sys.exit(1)
-
-        client = anthropic.Anthropic()  # reads ANTHROPIC_API_KEY from env
-        response = client.messages.create(
-            model=subscriber.model,
-            max_tokens=4000,
-            messages=[{"role": "user", "content": prompt}],
-        )
-        raw = response.content[0].text
-
-    elif subscriber.model_provider == "openai":
-        try:
-            from openai import OpenAI  # type: ignore
-        except ImportError:
-            sys.stderr.write("pip install openai\n")
-            sys.exit(1)
-        client = OpenAI()
-        response = client.chat.completions.create(
-            model=subscriber.model,
-            messages=[{"role": "user", "content": prompt}],
-            response_format={"type": "json_object"},
-        )
-        raw = response.choices[0].message.content
-
-    else:
-        raise ValueError(f"Unknown provider: {subscriber.model_provider}")
-
-    # Strip fences if the model added them
-    raw = raw.strip()
-    if raw.startswith("```"):
-        raw = raw.split("```")[1]
-        if raw.startswith("json"):
-            raw = raw[4:]
-    return json.loads(raw)
-
-
-# ---------- 3. Transcript collection (pluggable) ----------------------------
-
-def pull_transcripts(subscriber: Subscriber, days: int = 7) -> str:
-    """
-    Stub: read the subscriber's recent conversations. Real implementations
-    would plug into the provider's conversation API or a local transcript store.
-
-    For local-only use, drop a file at ./transcripts/{subscriber_id}.txt with
-    this week's conversations, one per paragraph.
-    """
-    local_path = HERE / "transcripts" / f"{subscriber.id}.txt"
-    if local_path.exists():
-        return local_path.read_text()
-
-    # Fallback stub, real system would call conversation APIs here.
-    cutoff = datetime.now() - timedelta(days=days)
-    return f"[stub: no transcripts found for {subscriber.id} since {cutoff.isoformat()}]"
-
-
-def load_ledger(subscriber: Subscriber) -> dict:
-    """Load the running preference ledger for this subscriber."""
-    path = HERE / "ledgers" / f"{subscriber.id}.json"
-    if path.exists():
-        return json.loads(path.read_text())
-    return {"letter_number": 0, "preferences": [], "retired": [], "calibration_pct": 50}
-
-
-def save_ledger(subscriber: Subscriber, ledger: dict) -> None:
-    path = HERE / "ledgers" / f"{subscriber.id}.json"
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(ledger, indent=2))
-
-
-# ---------- 4. Delta gate (Elon's default-silence principle) ----------------
-
-def has_meaningful_delta(signals: dict) -> bool:
-    """Skip the letter if nothing worth reading happened this week."""
-    if signals.get("skip"):
-        return False
-    if len(signals.get("consequences", [])) == 0 and len(signals.get("observations", [])) == 0:
-        return False
-    return True
-
-
-# ---------- 5. Render -------------------------------------------------------
-
-def _fill_defaults(signals: dict) -> dict:
-    """Fill in optional letterhead/signature fields so the template always renders
-    cleanly, even for signals JSON produced before these fields were added."""
-    name = signals.get("name", "Friend")
-    words = name.split()
-    if len(words) >= 2:
-        initials = (words[0][0] + words[1][0]).upper()
-    elif name:
-        initials = name[:2].upper()
-    else:
-        initials = "-"
-    initials = signals.get("initials") or initials
-    salutation = signals.get("salutation") or f"My Darling {name},"
-    closing_line = signals.get("closing_line") or "Much love,"
-    signoff = signals.get("signoff") or "a friend who's been paying attention"
-    # salutation_chars is used inside a CSS @keyframes rule to drive the typewriter
-    # step count. Must be an int.
-    salutation_chars = signals.get("salutation_chars") or max(1, len(salutation))
-    return {
-        **signals,
-        "initials": initials,
-        "salutation": salutation,
-        "salutation_chars": salutation_chars,
-        "closing_line": closing_line,
-        "signoff": signoff,
-    }
-
-
-def render_letter(signals: dict) -> str:
-    signals = _fill_defaults(signals)
-    if Environment is not None:
-        env = Environment(
-            loader=FileSystemLoader(REFERENCES),
-            autoescape=select_autoescape(["html"]),
-        )
-        template = env.get_template("template.html")
-        return template.render(**signals)
-    return render_letter_without_jinja(signals)
-
-
-def _text(value: Any, default: str = "") -> str:
-    if value is None:
-        value = default
-    return html.escape(str(value), quote=True)
-
-
-def _safe(value: Any, default: str = "") -> str:
-    if value is None:
-        return default
-    return str(value)
+@dataclass(frozen=True)
+class RunResult:
+    status: str
+    out_path: Path | None
+    letter_number: int | None
+    reason: str | None = None
 
 
 def _style_block() -> str:
-    template = TEMPLATE_PATH.read_text()
-    start = template.index("<style>")
-    end = template.index("</style>") + len("</style>")
-    return template[start:end]
+    return f"<style>\n{STYLE_PATH.read_text()}\n</style>"
 
 
-def render_letter_without_jinja(signals: dict) -> str:
-    """Render the sample letter without third-party dependencies.
+def _rich(value: Any) -> str:
+    return sanitize_rich_text(value)
 
-    Codex plugin installs should be usable before a user has added Python
-    packages. This keeps offline preview mode working when jinja2 is absent.
-    """
-    consequences = "".join(
+
+def _section(number: int, title: str, body: str) -> str:
+    return f"""
+    <section class="section">
+      <div class="section-head">
+        <span class="section-num">{number:02d}</span>
+        <h2 class="section-title">{text(title)}</h2>
+      </div>
+      {body.strip()}
+    </section>"""
+
+
+def _render_consequences(items: list[dict[str, Any]]) -> str:
+    rows = "".join(
         f"""
         <li class="csq">
           <div>
-            <span class="csq-tag">{_text(c.get("tag"))}</span>
-            <h3 class="csq-title">{_text(c.get("title"))}</h3>
-            <p class="csq-body">{_safe(c.get("body"))}</p>
-            {f'<div class="csq-because">{_safe(c.get("because"))}</div>' if c.get("because") else ""}
+            <span class="csq-tag">{text(item['tag'])}</span>
+            <h3 class="csq-title">{text(item['title'])}</h3>
+            <p class="csq-body">{_rich(item['body'])}</p>
+            <div class="csq-because">{_rich(item['because'])}</div>
+            <div class="obs-prov">{text(item['provenance'])}</div>
           </div>
         </li>"""
-        for c in signals.get("consequences", [])
+        for item in items
     )
-    consequences_section = f"""
-    <section class="section">
-      <div class="section-head">
-        <span class="section-num">01</span>
-        <h2 class="section-title">What I did this week</h2>
-      </div>
-      <ol class="csq-list">{consequences}
-      </ol>
-    </section>""" if consequences else ""
+    return f'<ol class="csq-list">{rows}</ol>'
 
-    decision_items = "".join(
+
+def _render_decisions_and_tasks(
+    decisions: list[dict[str, Any]], tasks: list[dict[str, Any]]
+) -> str:
+    decision_rows = "".join(
         f"""
         <li class="csq">
           <div>
             <span class="csq-tag">Decision</span>
-            <h3 class="csq-title">{_text(d.get("title"))}</h3>
-            <p class="csq-body">{_safe(d.get("body"))}</p>
-            {f'<div class="csq-because">{_text(d.get("provenance"))}</div>' if d.get("provenance") else ""}
+            <h3 class="csq-title">{text(item['title'])}</h3>
+            <p class="csq-body">{_rich(item['body'])}</p>
+            <div class="obs-prov">{text(item['provenance'])}</div>
           </div>
         </li>"""
-        for d in signals.get("decisions", [])
+        for item in decisions
     )
-    task_items = "".join(
+    task_rows = "".join(
         f"""
         <li class="csq">
           <div>
             <span class="csq-tag">Open loop</span>
-            <h3 class="csq-title">{_text(t.get("title"))}</h3>
-            <p class="csq-body">{_safe(t.get("body"))}</p>
-            {f'<div class="csq-because">{_text(" · ".join(part for part in [("Owner: " + str(t.get("owner"))) if t.get("owner") else "", str(t.get("provenance") or "")] if part))}</div>' if (t.get("owner") or t.get("provenance")) else ""}
+            <h3 class="csq-title">{text(item['title'])}</h3>
+            <p class="csq-body">{_rich(item['body'])}</p>
+            <div class="csq-because">Owner: {text(item['owner'])}</div>
+            <div class="obs-prov">{text(item['provenance'])}</div>
           </div>
         </li>"""
-        for t in signals.get("open_tasks", [])
+        for item in tasks
     )
-    decisions_section = f"""
-    <section class="section">
-      <div class="section-head">
-        <span class="section-num">02</span>
-        <h2 class="section-title">Decisions and open loops</h2>
-      </div>
-      <ol class="csq-list">{decision_items}{task_items}
-      </ol>
-    </section>""" if (decision_items or task_items) else ""
+    return f'<ol class="csq-list">{decision_rows}{task_rows}</ol>'
 
-    observations = "".join(
+
+def _render_observations(items: list[dict[str, Any]]) -> str:
+    return "".join(
         f"""
       <div class="obs">
         <div class="obs-head">
-          <span class="badge {_text(o.get("hedge_class"))}">{_text(o.get("hedge_label"))}</span>
-          {f'<span class="obs-when">· {_text(o.get("learned_date"))}</span>' if o.get("learned_date") else ""}
+          <span class="badge {text(item['hedge_class'])}">{text(item['hedge_label'])}</span>
+          <span class="obs-when">· {text(item['learned_date'])}</span>
         </div>
-        <h3 class="obs-title">{_text(o.get("title"))}</h3>
-        <p class="obs-body">{_safe(o.get("body"))}</p>
-        {f'<div class="obs-evidence">{_safe(o.get("evidence"))}</div>' if o.get("evidence") else ""}
-        {f'<div class="obs-prov">{_text(o.get("provenance"))}</div>' if o.get("provenance") else ""}
+        <h3 class="obs-title">{text(item['title'])}</h3>
+        <p class="obs-body">{_rich(item['body'])}</p>
+        <div class="obs-evidence">{_rich(item['evidence'])}</div>
+        <div class="obs-prov">{text(item['provenance'])}</div>
       </div>"""
-        for o in signals.get("observations", [])
+        for item in items
     )
-    observations_section = f"""
-    <section class="section">
-      <div class="section-head">
-        <span class="section-num">03</span>
-        <h2 class="section-title">What I learned about you</h2>
-      </div>{observations}
-    </section>""" if observations else ""
 
-    retired = "".join(
+
+def _render_retired(items: list[dict[str, Any]]) -> str:
+    return "".join(
         f"""
       <div class="retired-card">
-        <p class="retired-old">{_text(r.get("old_belief"))}</p>
+        <p class="retired-old">{text(item['old_belief'])}</p>
         <div class="retired-arrow">→ Replaced because</div>
-        <p class="retired-why">{_safe(r.get("why"))}</p>
+        <p class="retired-why">{_rich(item['why'])}</p>
+        <div class="obs-prov">{text(item['provenance'])}</div>
       </div>"""
-        for r in signals.get("retired", [])
+        for item in items
     )
-    retired_section = f"""
-    <section class="section">
-      <div class="section-head">
-        <span class="section-num">04</span>
-        <h2 class="section-title">What I retired</h2>
-      </div>{retired}
-    </section>""" if retired else ""
 
-    gap = signals.get("gap") or {}
-    gap_section = f"""
-    <section class="section">
-      <div class="section-head">
-        <span class="section-num">05</span>
-        <h2 class="section-title">The gap (stated vs. revealed)</h2>
-      </div>
+
+def _render_gap(item: dict[str, Any]) -> str:
+    return f"""
       <div class="gap-grid">
         <div class="gap-cell">
           <div class="gap-label">You said</div>
-          <p class="gap-value">{_text(gap.get("stated"))}</p>
-          <div class="gap-count">{_text(gap.get("stated_count"))}</div>
+          <p class="gap-value">{text(item['stated'])}</p>
+          <div class="gap-count">{text(item['stated_count'])}</div>
         </div>
         <div class="gap-cell">
           <div class="gap-label">You did</div>
-          <p class="gap-value">{_text(gap.get("revealed"))}</p>
-          <div class="gap-count">{_text(gap.get("revealed_count"))}</div>
+          <p class="gap-value">{text(item['revealed'])}</p>
+          <div class="gap-count">{text(item['revealed_count'])}</div>
         </div>
       </div>
-    </section>""" if gap else ""
+      <div class="obs-prov">{text(item['provenance'])}</div>"""
 
-    becoming = signals.get("becoming") or {}
-    becoming_section = f"""
-    <section class="section">
-      <div class="section-head">
-        <span class="section-num">06</span>
-        <h2 class="section-title">What you're becoming</h2>
-      </div>
+
+def _render_becoming(item: dict[str, Any]) -> str:
+    return f"""
       <div class="becoming-card">
-        <h3 class="becoming-title">{_text(becoming.get("title"))}</h3>
-        <p class="becoming-body">{_safe(becoming.get("body"))}</p>
-      </div>
-    </section>""" if becoming else ""
+        <h3 class="becoming-title">{text(item['title'])}</h3>
+        <p class="becoming-body">{_rich(item['body'])}</p>
+        <div class="obs-prov">{text(item['provenance'])}</div>
+      </div>"""
 
-    question_section = f"""
-    <section class="question-block">
-      <div class="question-label">07 · One question</div>
-      <p class="question">{_safe(signals.get("question"))}</p>
-      {f'<p class="question-note">{_text(signals.get("question_note"))}</p>' if signals.get("question_note") else ""}
-    </section>""" if signals.get("question") else ""
 
+def render_letter(
+    signals: dict[str, Any],
+    *,
+    archive_href: str | None = "../index.html",
+    export_href: str | None = None,
+) -> str:
+    """Render validated signals through the single dependency-free HTML path."""
+    validated = validate_signals(signals)
+    if validated.get("skip"):
+        raise ValidationError("skip payloads cannot be rendered")
+
+    sections: list[str] = []
+    number = 1
+    if validated["consequences"]:
+        sections.append(
+            _section(number, "What I did this week", _render_consequences(validated["consequences"]))
+        )
+        number += 1
+    if validated["decisions"] or validated["open_tasks"]:
+        sections.append(
+            _section(
+                number,
+                "Decisions and open loops",
+                _render_decisions_and_tasks(validated["decisions"], validated["open_tasks"]),
+            )
+        )
+        number += 1
+    if validated["observations"]:
+        sections.append(
+            _section(number, "What I learned about you", _render_observations(validated["observations"]))
+        )
+        number += 1
+    if validated["retired"]:
+        sections.append(_section(number, "What I retired", _render_retired(validated["retired"])))
+        number += 1
+    if validated.get("gap"):
+        sections.append(_section(number, "The gap (stated vs. revealed)", _render_gap(validated["gap"])))
+        number += 1
+    if validated.get("becoming"):
+        sections.append(_section(number, "What you're becoming", _render_becoming(validated["becoming"])))
+        number += 1
+
+    source = validated.get("source_summary") or {}
+    source_line = ""
+    if source:
+        source_line = (
+            f"{text(source['thread_count'])} threads · {text(source['message_count'])} messages · "
+            f"{text(source['window_start'])} → {text(source['window_end'])}"
+        )
+    export_link = ""
+    if export_href:
+        export_link = f'<a href="{text(export_href)}" download>Export HTML</a>'
+    archive_link = (
+        f'<a href="{text(archive_href)}">Archive</a>' if archive_href else ""
+    )
+    wordmark = (
+        f'<a class="wordmark" href="{text(archive_href)}"><span class="dot"></span>The Sunday Letter</a>'
+        if archive_href
+        else '<span class="wordmark"><span class="dot"></span>The Sunday Letter</span>'
+    )
+
+    letter_number = int(validated["letter_number"])
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Letter №{_text(signals.get("letter_number"))} · {_text(signals.get("date"))} · The Sunday Letter</title>
-<meta name="description" content="A weekly note from your agent. What it did. What it learned. What it retired.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+<title>Letter №{letter_number} · {text(validated['date'])} · The Sunday Letter</title>
+<meta name="description" content="A local weekly note grounded in recent Codex conversations.">
 {_style_block()}
 </head>
 <body>
 <header class="topbar">
-  <a class="wordmark" href="#"><span class="dot"></span>The Sunday Letter</a>
-  <div class="meta-right">
-    <span><span class="dot"></span>Letter №{_text(signals.get("letter_number"))}</span>
-    <span>{_text(signals.get("date"))}</span>
-  </div>
+  {wordmark}
+  <div class="meta-right"><span>Letter №{letter_number}</span><span>{text(validated['date'])}</span></div>
 </header>
 <main class="container">
   <article class="note">
     <div class="note-meta">
-      <div class="note-meta-left">
-        <span class="num">№{_text(signals.get("letter_number"))}</span> &nbsp;·&nbsp; {_text(signals.get("date"))} &nbsp;·&nbsp; for {_text(signals.get("name"))}
-      </div>
-      <div class="note-meta-right">
-        Calibration {_text(signals.get("calibration_pct"))}% · {_text(signals.get("tracking_signals"))} signals
-      </div>
+      <div class="note-meta-left"><span class="num">№{letter_number}</span> · {text(validated['date'])} · for {text(validated['name'])}</div>
+      <div class="note-meta-right">{source_line}</div>
     </div>
-    <h1 class="note-title">{_text(signals.get("hero_headline"))}</h1>
-    <p class="note-lede">{_safe(signals.get("hero_lede"))}</p>
-    {consequences_section}
-    {decisions_section}
-    {observations_section}
-    {retired_section}
-    {gap_section}
-    {becoming_section}
-    {question_section}
+    <h1 class="note-title">{text(validated['hero_headline'])}</h1>
+    <p class="note-lede">{_rich(validated['hero_lede'])}</p>
+    {''.join(sections)}
+    <section class="question-block">
+      <div class="question-label">{number:02d} · One question</div>
+      <p class="question">{_rich(validated['question'])}</p>
+      {f'<p class="question-note">{text(validated.get("question_note"))}</p>' if validated.get('question_note') else ''}
+    </section>
     <div class="note-close">
       <div class="signoff">
-        <div class="signoff-line">{_text(signals.get("closing_line"))}</div>
-        <div class="sig-name">{_text(signals.get("signoff"))}</div>
+        <div class="signoff-line">{text(validated.get('closing_line'), 'Until next week,')}</div>
+        <div class="sig-name">{text(validated.get('signoff'), 'your attentive agent')}</div>
       </div>
       <div class="close-mark">× × ×</div>
     </div>
     <div class="note-foot">
-      <div class="note-foot-left">{_text(signals.get("tracking_conversations"))} conversations · {_text(signals.get("hours_saved"))} hours saved · {_text(signals.get("exports"))} exports</div>
-      <div class="note-foot-right">
-        <a href="#">Pause</a>
-        <a href="#">Export</a>
-        <a href="#">Archive</a>
-      </div>
+      <div class="note-foot-left">Local Codex sources only</div>
+      <div class="note-foot-right">{export_link}{archive_link}</div>
     </div>
   </article>
 </main>
@@ -534,115 +274,205 @@ def render_letter_without_jinja(signals: dict) -> str:
 """
 
 
-# ---------- 6. Delivery (pluggable) -----------------------------------------
-
-def deliver(subscriber: Subscriber, html: str, signals: dict) -> None:
-    """Ship the rendered letter via the subscriber's chosen channel."""
-    if subscriber.channel == "email":
-        deliver_email(subscriber, html, signals)
-    elif subscriber.channel == "imessage":
-        deliver_imessage(subscriber, html, signals)
-    elif subscriber.channel == "printed":
-        deliver_printed(subscriber, html, signals)
-    elif subscriber.channel == "voice":
-        deliver_voice(subscriber, html, signals)
-    else:
-        raise ValueError(f"Unknown channel: {subscriber.channel}")
+def _relative_archive_href(out_path: Path, ledger_path: Path) -> str:
+    target = ledger_path.expanduser().resolve().parent / "index.html"
+    return Path(os.path.relpath(target, out_path.expanduser().resolve().parent)).as_posix()
 
 
-def deliver_email(subscriber, html, signals):
-    # Replace with your SMTP / Resend / SendGrid / Postmark integration.
-    print(f"[email → {subscriber.email}] Subject: Your Sunday Letter, No. {signals['letter_number']}")
-    out = HERE / "sent" / f"{subscriber.id}-{signals['letter_number']:03d}.html"
-    out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(html)
-    print(f"  saved to {out}")
+def _ledger_file_value(out_path: Path, ledger_path: Path) -> str:
+    try:
+        return out_path.expanduser().resolve().relative_to(
+            ledger_path.expanduser().resolve().parent
+        ).as_posix()
+    except ValueError:
+        return out_path.name
 
 
-def deliver_imessage(subscriber, html, signals):
-    # Replace with a real iMessage bridge (e.g. Bluebubbles, osascript on macOS).
-    summary = f"Sunday Letter #{signals['letter_number']}: {len(signals.get('consequences', []))} things done · {len(signals.get('observations', []))} new beliefs · 1 question"
-    print(f"[imessage → {subscriber.phone}] {summary}")
+def _rebuild_archive(ledger_path: Path) -> None:
+    from manage_archive import build_archive
+
+    build_archive(ledger_path.expanduser().resolve().parent)
 
 
-def deliver_printed(subscriber, html, signals):
-    # Replace with a print-and-mail integration (e.g. Lob).
-    print(f"[printed → mailing to {subscriber.name}] queued for postcard fulfillment")
+def read_context_source_summary(context_path: Path) -> dict[str, Any]:
+    """Read measured source metadata from the collector-owned header."""
+    header = context_path.expanduser().read_text().split("> BEGIN TRANSCRIPT DATA", 1)[0]
+    labels = {
+        "Window start": "window_start",
+        "Window end": "window_end",
+        "Source scope": "scope",
+        "Threads included": "thread_count",
+        "Messages included": "message_count",
+    }
+    found: dict[str, Any] = {}
+    for line in header.splitlines():
+        for label, key in labels.items():
+            prefix = f"{label}: "
+            if line.startswith(prefix):
+                value: Any = line[len(prefix) :].strip()
+                if key in {"thread_count", "message_count"}:
+                    try:
+                        value = int(value)
+                    except ValueError as error:
+                        raise ValidationError(
+                            f"context header {label!r} must be an integer"
+                        ) from error
+                found[key] = value
+    missing = sorted(set(labels.values()) - set(found))
+    if missing:
+        raise ValidationError(
+            f"context header is missing measured source fields: {', '.join(missing)}"
+        )
+    return found
 
 
-def deliver_voice(subscriber, html, signals):
-    # Replace with TTS + voicemail / call integration.
-    print(f"[voice digest → {subscriber.phone}] rendered audio queued")
-
-
-# ---------- 7. CLI ----------------------------------------------------------
-
-def run_live(subscriber_id: str) -> None:
-    subscribers = json.loads((HERE / "subscribers.json").read_text())
-    sub_data = next((s for s in subscribers if s["id"] == subscriber_id), None)
-    if sub_data is None:
-        sys.exit(f"No subscriber: {subscriber_id}")
-    subscriber = Subscriber(**sub_data)
-    if subscriber.paused:
-        print(f"[{subscriber.id}] paused, skipping")
+def _verify_source_summary(
+    signals: dict[str, Any], expected_source_summary: dict[str, Any] | None
+) -> None:
+    if signals.get("skip") or expected_source_summary is None:
         return
-
-    transcripts = pull_transcripts(subscriber)
-    ledger = load_ledger(subscriber)
-    signals = call_model_for_signals(subscriber, transcripts, ledger)
-
-    if not has_meaningful_delta(signals):
-        print(f"[{subscriber.id}] no meaningful delta, staying silent")
-        return
-
-    html = render_letter(signals)
-    deliver(subscriber, html, signals)
-    save_ledger(subscriber, {**ledger, **{
-        "letter_number": signals["letter_number"],
-        "last_sent": date.today().isoformat(),
-    }})
+    actual = signals["source_summary"]
+    mismatches = [
+        key
+        for key in ("thread_count", "message_count", "window_start", "window_end", "scope")
+        if actual.get(key) != expected_source_summary.get(key)
+    ]
+    if mismatches:
+        raise ValidationError(
+            "signals.source_summary does not match the collector bundle: "
+            + ", ".join(mismatches)
+        )
 
 
-def run_from_file(signals_path: Path, out_path: Path) -> None:
-    signals = json.loads(signals_path.read_text())
-    html = render_letter(signals)
-    out_path.write_text(html)
-    print(f"Rendered {out_path} ({len(html)} bytes)")
+def process_signals(
+    signals: dict[str, Any],
+    *,
+    out_path: Path | None,
+    ledger_path: Path,
+    update_ledger: bool = True,
+    expected_source_summary: dict[str, Any] | None = None,
+) -> RunResult:
+    """Run the validated pipeline. The delta gate always precedes rendering."""
+    validated = validate_signals(signals)
+    _verify_source_summary(validated, expected_source_summary)
+    ledger_path = Path(ledger_path).expanduser()
+    ledger = load_ledger(ledger_path) if update_ledger else default_ledger()
+    if update_ledger and ledger.get("paused"):
+        raise PausedError(f"Sunday Letter is paused in {ledger_path}")
 
+    run_date = today_iso()
+    if validated.get("skip"):
+        if update_ledger:
+            ledger["last_run"] = run_date
+            ledger["last_status"] = "skipped"
+            ledger["last_skip_reason"] = validated["reason"]
+            ledger["events"].append(
+                {"date": run_date, "status": "skipped", "reason": validated["reason"]}
+            )
+            save_ledger(ledger_path, ledger)
+            _rebuild_archive(ledger_path)
+        return RunResult("skipped", None, None, validated["reason"])
 
-def main():
-    p = argparse.ArgumentParser()
-    p.add_argument("--signals", type=Path, help="Path to a prebuilt signals JSON (offline mode).")
-    p.add_argument("--out", type=Path, default=Path("letter.html"))
-    p.add_argument("--subscriber", help="Subscriber id to run in live mode.")
-    p.add_argument("--live", action="store_true")
-    args = p.parse_args()
+    letter_number = ledger["letter_number"] + 1 if update_ledger else int(
+        validated.get("letter_number", 1)
+    )
+    prepared = deepcopy(validated)
+    prepared["letter_number"] = letter_number
+    if out_path is None:
+        out_path = (
+            ledger_path.parent / "letters" / f"{run_date}-letter-{letter_number:02d}.html"
+            if update_ledger
+            else Path("preview.html")
+        )
+    out_path = Path(out_path).expanduser()
 
-    if args.live and args.subscriber:
-        run_live(args.subscriber)
-    elif args.signals:
-        run_from_file(args.signals, args.out)
-    else:
-        p.error("need either --signals or --live --subscriber SUBID")
-
-
-def run_all_subscribers():
-    """Entry point for the weekly cron. Runs through every active subscriber."""
-    subs_path = HERE / "subscribers.json"
-    if not subs_path.exists():
-        print("No subscribers.json, nothing to do.")
-        return
-    subscribers = json.loads(subs_path.read_text())
-    for sub in subscribers:
+    if update_ledger:
+        archive_root = ensure_private_directory(ledger_path.parent)
         try:
-            run_live(sub["id"])
-        except Exception as e:
-            print(f"[{sub['id']}] error: {e}")
+            out_path.resolve().relative_to(archive_root.resolve())
+        except ValueError:
+            pass
+        else:
+            ensure_private_directory(out_path.parent)
+
+    rendered = render_letter(
+        prepared,
+        archive_href=_relative_archive_href(out_path, ledger_path) if update_ledger else None,
+        export_href=out_path.name,
+    )
+    atomic_write_text(out_path, rendered)
+    signals_out = out_path.with_suffix(".signals.json")
+    if update_ledger:
+        atomic_write_text(
+            signals_out,
+            json.dumps(prepared, indent=2, ensure_ascii=False, sort_keys=True) + "\n",
+        )
+
+    if update_ledger:
+        ledger["letter_number"] = letter_number
+        ledger["last_run"] = run_date
+        ledger["last_shipped"] = run_date
+        ledger["last_status"] = "shipped"
+        ledger["last_skip_reason"] = None
+        ledger["open_question"] = prepared["question"]
+        for retired in prepared["retired"]:
+            ledger["retired"].append({**retired, "retired_on": run_date})
+        record = {
+            "number": letter_number,
+            "date": prepared["date"],
+            "headline": prepared["hero_headline"],
+            "file": _ledger_file_value(out_path, ledger_path),
+            "signals_file": _ledger_file_value(signals_out, ledger_path),
+            "status": "shipped",
+        }
+        ledger["letters"].append(record)
+        ledger["events"].append({"date": run_date, **record})
+        save_ledger(ledger_path, ledger)
+        _rebuild_archive(ledger_path)
+
+    return RunResult("shipped", out_path, letter_number)
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="Validate, gate, render, and record a Codex-local Sunday Letter."
+    )
+    parser.add_argument("--signals", type=Path, required=True, help="Canonical signals JSON.")
+    parser.add_argument(
+        "--context",
+        type=Path,
+        help="Collector bundle used to verify measured source metadata. Required outside preview.",
+    )
+    parser.add_argument("--out", type=Path, help="Output HTML. Defaults to the local archive.")
+    parser.add_argument("--root", type=Path, default=DEFAULT_ROOT)
+    parser.add_argument("--ledger", type=Path, help="Defaults to <root>/ledger.json.")
+    parser.add_argument(
+        "--preview",
+        action="store_true",
+        help="Validate and render without updating the ledger.",
+    )
+    args = parser.parse_args()
+
+    if not args.preview and args.context is None:
+        parser.error("--context is required outside preview mode")
+
+    signals = json.loads(args.signals.read_text())
+    expected_source_summary = (
+        read_context_source_summary(args.context) if args.context is not None else None
+    )
+    ledger_path = args.ledger or args.root.expanduser() / "ledger.json"
+    result = process_signals(
+        signals,
+        out_path=args.out,
+        ledger_path=ledger_path,
+        update_ledger=not args.preview,
+        expected_source_summary=expected_source_summary,
+    )
+    if result.status == "skipped":
+        print(f"Skipped: {result.reason}")
+    else:
+        print(f"Rendered {result.out_path} as letter {result.letter_number}.")
 
 
 if __name__ == "__main__":
-    if len(sys.argv) == 1:
-        # bare `python generate_letter.py` = weekly cron mode
-        run_all_subscribers()
-    else:
-        main()
+    main()

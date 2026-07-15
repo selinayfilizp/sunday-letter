@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Top-level wrapper for the Sunday Letter renderer."""
+"""Top-level wrapper for the Codex-local Sunday Letter archive manager."""
 
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ import sys
 from pathlib import Path
 
 
-SCRIPT = Path(__file__).parent / "skills" / "sunday-letter" / "scripts" / "generate_letter.py"
+SCRIPT = Path(__file__).parent / "skills" / "sunday-letter" / "scripts" / "manage_archive.py"
 
 if __name__ == "__main__":
     sys.path.insert(0, str(SCRIPT.parent))

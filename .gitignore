@@ -8,3 +8,4 @@ venv/
 .vscode/
 node_modules/
 *.log
+.playwright-cli/

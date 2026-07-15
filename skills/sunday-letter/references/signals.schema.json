@@ -1,0 +1,178 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://selinayfilizp.github.io/sunday-letter/signals.schema.json",
+  "title": "Sunday Letter signals",
+  "oneOf": [
+    {
+      "title": "Silent week",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "skip", "reason"],
+      "properties": {
+        "schema_version": {"const": "1.0"},
+        "skip": {"const": true},
+        "reason": {"type": "string", "minLength": 1}
+      }
+    },
+    {
+      "title": "Shipped letter",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "name",
+        "date",
+        "hero_headline",
+        "hero_lede",
+        "source_summary",
+        "consequences",
+        "decisions",
+        "open_tasks",
+        "observations",
+        "retired",
+        "gap",
+        "becoming",
+        "question"
+      ],
+      "properties": {
+        "schema_version": {"const": "1.0"},
+        "letter_number": {"type": "integer", "minimum": 1},
+        "name": {"type": "string", "minLength": 1},
+        "date": {"type": "string", "minLength": 1},
+        "hero_headline": {"type": "string", "minLength": 1},
+        "hero_lede": {"type": "string", "minLength": 1},
+        "source_summary": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["thread_count", "message_count", "window_start", "window_end", "scope"],
+          "properties": {
+            "thread_count": {"type": "integer", "minimum": 1},
+            "message_count": {"type": "integer", "minimum": 1},
+            "window_start": {"type": "string", "format": "date-time"},
+            "window_end": {"type": "string", "format": "date-time"},
+            "scope": {"type": "string", "minLength": 1}
+          }
+        },
+        "consequences": {
+          "type": "array",
+          "minItems": 0,
+          "maxItems": 4,
+          "items": {"$ref": "#/$defs/consequence"}
+        },
+        "decisions": {
+          "type": "array",
+          "maxItems": 4,
+          "items": {"$ref": "#/$defs/decision"}
+        },
+        "open_tasks": {
+          "type": "array",
+          "maxItems": 5,
+          "items": {"$ref": "#/$defs/open_task"}
+        },
+        "observations": {
+          "type": "array",
+          "maxItems": 4,
+          "items": {"$ref": "#/$defs/observation"}
+        },
+        "retired": {
+          "type": "array",
+          "maxItems": 1,
+          "items": {"$ref": "#/$defs/retired"}
+        },
+        "gap": {
+          "type": ["object", "null"],
+          "additionalProperties": false,
+          "required": ["stated", "stated_count", "revealed", "revealed_count", "provenance"],
+          "properties": {
+            "stated": {"type": "string", "minLength": 1},
+            "stated_count": {"type": "string", "minLength": 1},
+            "revealed": {"type": "string", "minLength": 1},
+            "revealed_count": {"type": "string", "minLength": 1},
+            "provenance": {"type": "string", "minLength": 1}
+          }
+        },
+        "becoming": {
+          "type": ["object", "null"],
+          "additionalProperties": false,
+          "required": ["title", "body", "provenance"],
+          "properties": {
+            "title": {"type": "string", "minLength": 1},
+            "body": {"type": "string", "minLength": 1},
+            "provenance": {"type": "string", "minLength": 1}
+          }
+        },
+        "question": {"type": "string", "minLength": 1},
+        "question_note": {"type": "string"},
+        "closing_line": {"type": "string"},
+        "signoff": {"type": "string"}
+      }
+    }
+  ],
+  "$defs": {
+    "consequence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tag", "title", "body", "because", "provenance"],
+      "properties": {
+        "tag": {"type": "string", "minLength": 1},
+        "title": {"type": "string", "minLength": 1},
+        "body": {"type": "string", "minLength": 1},
+        "because": {"type": "string", "minLength": 1},
+        "provenance": {"type": "string", "minLength": 1}
+      }
+    },
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "body", "provenance"],
+      "properties": {
+        "title": {"type": "string", "minLength": 1},
+        "body": {"type": "string", "minLength": 1},
+        "provenance": {"type": "string", "minLength": 1}
+      }
+    },
+    "open_task": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "body", "owner", "provenance"],
+      "properties": {
+        "title": {"type": "string", "minLength": 1},
+        "body": {"type": "string", "minLength": 1},
+        "owner": {"type": "string", "minLength": 1},
+        "provenance": {"type": "string", "minLength": 1}
+      }
+    },
+    "observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "hedge_class",
+        "hedge_label",
+        "learned_date",
+        "title",
+        "body",
+        "evidence",
+        "provenance"
+      ],
+      "properties": {
+        "hedge_class": {"enum": ["firm", "soft", "guess"]},
+        "hedge_label": {"type": "string", "minLength": 1},
+        "learned_date": {"type": "string", "minLength": 1},
+        "title": {"type": "string", "minLength": 1},
+        "body": {"type": "string", "minLength": 1},
+        "evidence": {"type": "string", "minLength": 1},
+        "provenance": {"type": "string", "minLength": 1}
+      }
+    },
+    "retired": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["old_belief", "why", "provenance"],
+      "properties": {
+        "old_belief": {"type": "string", "minLength": 1},
+        "why": {"type": "string", "minLength": 1},
+        "provenance": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

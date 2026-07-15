@@ -1,7 +1,7 @@
 {
   "name": "sunday-letter",
-  "version": "0.2.0",
-  "description": "A weekly letter from your agent that reflects on what changed, what it learned, and one question worth sitting with.",
+  "version": "0.3.0",
+  "description": "A private local weekly letter grounded in dated, selected Codex conversations.",
   "author": {
     "name": "The Sunday Letter"
   },
@@ -17,13 +17,14 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "Sunday Letter",
-    "shortDescription": "A weekly reflective letter from your agent.",
-    "longDescription": "Sunday Letter turns the week into a restrained HTML note: what the agent did for you, what it learned, what it stopped believing, and one question worth sitting with. It ships only when something meaningful changed.",
+    "shortDescription": "A grounded weekly letter from local Codex conversations.",
+    "longDescription": "Sunday Letter collects dated local Codex messages, redacts common credentials, validates grounded signals, enforces default silence, and maintains a private local archive. It writes only when something meaningful changed.",
     "developerName": "The Sunday Letter",
     "category": "Productivity",
     "capabilities": [
       "Write",
-      "Reflect"
+      "Reflect",
+      "Archive"
     ],
     "websiteURL": "https://selinayfilizp.github.io/sunday-letter/",
     "defaultPrompt": [

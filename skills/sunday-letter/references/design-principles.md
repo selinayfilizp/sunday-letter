@@ -6,7 +6,7 @@ These are the six rules the letter obeys and the arguments behind them. If you'r
 
 **Rule:** Open with what you did for the user this week. Two to four actions. Each action has a reason that ties back to a known preference.
 
-**Argument (Ben Horowitz):** Users don't want to learn about themselves in the abstract. They want to know what got shipped on their behalf. "I drafted three recruiter replies because I know your wedge is AI labs" is a better opening than "I've been noticing patterns in your engagement."
+**Rationale:** Users do not need an abstract personality report before they know what actually happened. "I drafted three replies because you asked me to protect your focus time" is a better opening than "I've been noticing patterns in your engagement."
 
 **What this looks like wrong:** A letter that opens with observations. The user has to scroll to find out what you actually did.
 
@@ -14,7 +14,7 @@ These are the six rules the letter obeys and the arguments behind them. If you'r
 
 **Rule:** Hedge every observation in natural language. Never fake percentages. Use `firm` only with 5+ consistent signals; `soft` with 2–4; `guess` for new patterns still forming.
 
-**Argument (Amanda Askell):** A model that says "I'm 83% confident you prefer X" is lying with math. It doesn't have well-calibrated posteriors; it has vibes. Saying "Fairly sure, this held across nine conversations" is more honest and more legible.
+**Rationale:** A model that says "I'm 83% confident you prefer X" is implying measurement it does not have. Saying "Fairly sure, this held across nine conversations" is more honest and more legible.
 
 **What this looks like wrong:** Confidence intervals. Probability estimates. Any language that implies statistical rigor the model doesn't have.
 
@@ -22,7 +22,7 @@ These are the six rules the letter obeys and the arguments behind them. If you'r
 
 **Rule:** Every observation needs a real quote (paraphrased if long) from an actual message this week, plus a date. If you can't source it, cut it.
 
-**Argument (Amanda Askell):** The reader needs to verify. If I claim you prefer depth to brevity, I need to be able to show the conversation where you rewrote my short answer into a long one. Without provenance, observations are unfalsifiable and therefore meaningless.
+**Rationale:** The reader needs to verify. If the agent claims the user prefers depth to brevity, it needs to identify the dated conversation where the user expanded a short answer. Without provenance, observations are unfalsifiable.
 
 **What this looks like wrong:** "I've noticed you like brevity." No date. No evidence. No way for the user to check.
 
@@ -30,7 +30,7 @@ These are the six rules the letter obeys and the arguments behind them. If you'r
 
 **Rule:** If nothing meaningful changed vs. last week, don't ship.
 
-**Argument (Elon Musk):** A weekly letter that ships 52 times a year regardless of content is noise. A letter that ships 20 times a year, only when there's something to say, is signal. Default silence is the feature.
+**Rationale:** A weekly letter that ships regardless of content becomes noise. A letter that ships only when there is something to say remains signal. Default silence is the feature.
 
 **What this looks like wrong:** Shipping a letter every Sunday because it's Sunday, even when nothing happened. The content will be thin. The user will stop reading.
 
@@ -38,7 +38,7 @@ These are the six rules the letter obeys and the arguments behind them. If you'r
 
 **Rule:** At least once a month, cross out a belief you used to hold about the user and replace it with what you hold now. Explain what changed your mind.
 
-**Argument (Elon Musk):** If the model is learning, it is changing its mind. If it never retires a belief, either it isn't learning or it isn't telling you. Both are bad. The retired belief is the single most trust-building item in the letter because it proves the model is correctable.
+**Rationale:** If the model is learning, it sometimes changes its mind. A retired belief is trust-building because it proves the model is correctable. The ledger must show that the belief was actually held before it can be retired.
 
 **What this looks like wrong:** Month after month of additive observations, no retractions. Implies perfect calibration from day one, which is a lie.
 
@@ -46,23 +46,22 @@ These are the six rules the letter obeys and the arguments behind them. If you'r
 
 **Rule:** One generative, specific question pointed at something the user is actually wrestling with. Not philosophical. Not rhetorical. Not a list.
 
-**Argument (Andrej Karpathy):** The question is the only place in the letter where the agent hands agency back to the user. Two questions is a survey. Zero questions is a dashboard. One question is a conversation.
+**Rationale:** The question is where the agent hands agency back to the user. Two questions is a survey. Zero questions makes the note feel like a dashboard. One question keeps it a conversation.
 
 **What this looks like wrong:** "What do you think about the future of AI?" (too abstract). "Did you like this letter?" (rhetorical). "Which direction next?" paired with three other questions (listicle).
 
 ## Secondary principles
 
-**Preferences are portable.** The preference ledger is the user's, not the agent's. If the user switches models, they should be able to hand the next model their preference profile on day one. Format it as structured data, not prose.
+**The ledger belongs to the user.** It stays in the local Sunday Letter archive as structured data. Cross-agent profile export is a future capability, not a current claim.
 
 **Becoming is a first-class section.** Preferences in motion deserve to be named before they crystallize. "Six weeks ago you defended X. This week you asked about Y. The shift is real but not yet complete." The user doesn't always know they're changing.
 
-**The gap is worth tracking.** Stated preferences and revealed preferences usually diverge. Showing the gap honestly, "You say you want concise. You engage 3.2× longer with long answers.", invites the user into the calibration work.
+**The gap is worth tracking when it is observable.** Showing "You asked for concise, then expanded the same answer through four revisions" is grounded in conversation history. Do not invent engagement telemetry the collector cannot see.
 
 **Tone is warm, not clinical.** This is correspondence. The agent is writing to someone it knows. Avoid report language. Avoid bullet-list overload. Write in sentences.
 
-## The four critics in one line each
+## Product boundary
 
-- **Elon:** Default silence. Retire beliefs. Everything else is noise.
-- **Karpathy:** Model the user's reward function. Show your uncertainty.
-- **Ben:** Lead with consequences. Observations come second.
-- **Amanda:** Provenance on every claim. Hedge honestly. Preferences belong to the user.
+These principles describe the letter's editorial behavior. They do not imply
+background tracking, remote delivery, or access to data outside the selected
+local Codex conversation bundle.
