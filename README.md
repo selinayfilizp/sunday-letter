@@ -1,5 +1,9 @@
 # The Sunday Letter
 
+![A weekly letter from your AI, about you](docs/og.png)
+
+[Site](https://selinayfilizp.github.io/sunday-letter/) · [Sample letter](https://selinayfilizp.github.io/sunday-letter/sample-letter.html) · MIT
+
 A private local weekly note grounded in recent Codex or Claude Code
 conversations: what the agent actually completed, what changed in its model of
 you, what it stopped believing, and one question worth sitting with.
