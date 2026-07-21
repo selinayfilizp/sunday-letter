@@ -35,7 +35,7 @@ button.secondary,.button.secondary { background:transparent; color:var(--ink); b
 .entry h2 { margin:0 0 6px; font-size:20px; letter-spacing:-.02em; }
 .entry p { margin:0; color:var(--muted); line-height:1.5; }
 .entry a { color:var(--ink); }
-.silent h2 { font-style:italic; color:var(--muted); }
+.silent h2 { font-style:normal; color:var(--muted); }
 .actions { display:flex; gap:8px; align-items:center; }
 .empty { padding:44px 0; color:var(--muted); }
 .local-note { margin-top:28px; padding-top:18px; border-top:1px solid var(--rule); color:var(--muted); font-size:13px; line-height:1.5; }
@@ -94,7 +94,7 @@ def build_archive(root: Path) -> Path:
           <div class="meta">{text(event.get('date'))} · №{text(event.get('number'))}</div>
           <div>
             <h2><a href="{text(file_value)}">{text(event.get('headline'), 'Untitled letter')}</a></h2>
-            <p>A grounded note from the selected local Codex sources.</p>
+            <p>{text(event.get('source'), 'A grounded note from selected local sources.')}</p>
           </div>
           <div class="actions">
             <a class="button secondary" href="{text(file_value)}" download>Export</a>
@@ -124,7 +124,7 @@ def build_archive(root: Path) -> Path:
 </head>
 <body>
 <main class="shell">
-  <div class="eyebrow">Private local archive · Codex</div>
+  <div class="eyebrow">Private local archive</div>
   <h1>The Sunday Letter</h1>
   <p class="lede">A running record of shipped letters and intentional silence. This page is generated from <code>ledger.json</code> and files under <code>letters/</code>.</p>
   <div class="toolbar">
@@ -215,8 +215,29 @@ def export_archive(root: Path, out_path: Path) -> Path:
     return out_path
 
 
+def _host_allowed(host_header: str, server_port: int) -> bool:
+    """Only loopback names may address this server. Blocks DNS rebinding."""
+    host = (host_header or "").strip().lower()
+    if not host:
+        return False
+    if host.startswith("["):
+        return False
+    name, _, port = host.partition(":")
+    if name not in {"127.0.0.1", "localhost"}:
+        return False
+    if port and port != str(server_port):
+        return False
+    return True
+
+
 def _handler(root: Path) -> type[BaseHTTPRequestHandler]:
     class ArchiveHandler(BaseHTTPRequestHandler):
+        def _reject_bad_host(self) -> bool:
+            if _host_allowed(self.headers.get("Host", ""), self.server.server_address[1]):
+                return False
+            self.send_error(HTTPStatus.FORBIDDEN, "unrecognized host name for the local archive")
+            return True
+
         def _redirect_home(self) -> None:
             self.send_response(HTTPStatus.SEE_OTHER)
             self.send_header("Location", "/")
@@ -236,6 +257,8 @@ def _handler(root: Path) -> type[BaseHTTPRequestHandler]:
                 shutil.copyfileobj(source, self.wfile)
 
         def do_GET(self) -> None:  # noqa: N802
+            if self._reject_bad_host():
+                return
             parsed = urlparse(self.path)
             if parsed.path == "/":
                 self._serve_file(build_archive(root), "text/html; charset=utf-8")
@@ -255,6 +278,8 @@ def _handler(root: Path) -> type[BaseHTTPRequestHandler]:
             self.send_error(HTTPStatus.NOT_FOUND)
 
         def do_POST(self) -> None:  # noqa: N802
+            if self._reject_bad_host():
+                return
             origin = self.headers.get("Origin")
             expected_origin = f"http://{self.headers.get('Host', '')}"
             if origin and origin != expected_origin:

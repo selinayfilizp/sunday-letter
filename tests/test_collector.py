@@ -30,6 +30,22 @@ def response(timestamp: str | None, text: str) -> dict:
     return item
 
 
+class RedactionTests(unittest.TestCase):
+    def test_redacts_jwt_private_key_and_slack_tokens(self) -> None:
+        jwt = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9P"
+        pem = "-----BEGIN RSA PRIVATE KEY-----\nMIIEowIBAAKCAQEA\n-----END RSA PRIVATE KEY-----"
+        slack = "xoxb-1234567890-abcdefghijkl"
+        redacted = collector.redact_text(f"token {jwt} and {pem} and {slack}")
+        self.assertNotIn(jwt, redacted)
+        self.assertNotIn("MIIEowIBAAKCAQEA", redacted)
+        self.assertNotIn(slack, redacted)
+        self.assertIn("[REDACTED PRIVATE KEY]", redacted)
+
+    def test_keeps_ordinary_prose_untouched(self) -> None:
+        prose = "We shipped the newsletter and the ledger update on Tuesday."
+        self.assertEqual(collector.redact_text(prose), prose)
+
+
 class CollectorTests(unittest.TestCase):
     def test_filters_each_message_by_timestamp_and_excludes_undated(self) -> None:
         with tempfile.TemporaryDirectory() as temp:

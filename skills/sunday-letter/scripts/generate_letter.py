@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+from datetime import date
 from copy import deepcopy
 from dataclasses import dataclass
 from pathlib import Path
@@ -32,6 +33,17 @@ DEFAULT_ROOT = Path.home() / "sunday-letter"
 
 class PausedError(RuntimeError):
     """The local subscription is paused in the ledger."""
+
+
+class DuplicateWeekError(RuntimeError):
+    """A letter already shipped inside the current weekly window."""
+
+
+def _days_since(iso_day: str, today: str) -> int | None:
+    try:
+        return (date.fromisoformat(today) - date.fromisoformat(iso_day)).days
+    except ValueError:
+        return None
 
 
 @dataclass(frozen=True)
@@ -234,7 +246,7 @@ def render_letter(
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
 <title>Letter №{letter_number} · {text(validated['date'])} · The Sunday Letter</title>
-<meta name="description" content="A local weekly note grounded in recent Codex conversations.">
+<meta name="description" content="A local weekly note grounded in dated local agent conversations.">
 {_style_block()}
 </head>
 <body>
@@ -264,7 +276,7 @@ def render_letter(
       <div class="close-mark">× × ×</div>
     </div>
     <div class="note-foot">
-      <div class="note-foot-left">Local Codex sources only</div>
+      <div class="note-foot-left">{text(source.get('scope'), 'Local sources only')}</div>
       <div class="note-foot-right">{export_link}{archive_link}</div>
     </div>
   </article>
@@ -351,6 +363,7 @@ def process_signals(
     ledger_path: Path,
     update_ledger: bool = True,
     expected_source_summary: dict[str, Any] | None = None,
+    allow_duplicate_week: bool = False,
 ) -> RunResult:
     """Run the validated pipeline. The delta gate always precedes rendering."""
     validated = validate_signals(signals)
@@ -361,6 +374,18 @@ def process_signals(
         raise PausedError(f"Sunday Letter is paused in {ledger_path}")
 
     run_date = today_iso()
+    if (
+        update_ledger
+        and not validated.get("skip")
+        and not allow_duplicate_week
+        and ledger.get("last_shipped")
+    ):
+        elapsed = _days_since(str(ledger["last_shipped"]), run_date)
+        if elapsed is not None and 0 <= elapsed < 6:
+            raise DuplicateWeekError(
+                f"a letter already shipped on {ledger['last_shipped']} "
+                "(both hosts may be subscribed); pass --force to ship another this week"
+            )
     if validated.get("skip"):
         if update_ledger:
             ledger["last_run"] = run_date
@@ -421,6 +446,7 @@ def process_signals(
             "number": letter_number,
             "date": prepared["date"],
             "headline": prepared["hero_headline"],
+            "source": prepared["source_summary"]["scope"],
             "file": _ledger_file_value(out_path, ledger_path),
             "signals_file": _ledger_file_value(signals_out, ledger_path),
             "status": "shipped",
@@ -451,6 +477,11 @@ def main() -> None:
         action="store_true",
         help="Validate and render without updating the ledger.",
     )
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="Ship even if a letter already shipped inside the current weekly window.",
+    )
     args = parser.parse_args()
 
     if not args.preview and args.context is None:
@@ -461,13 +492,17 @@ def main() -> None:
         read_context_source_summary(args.context) if args.context is not None else None
     )
     ledger_path = args.ledger or args.root.expanduser() / "ledger.json"
-    result = process_signals(
-        signals,
-        out_path=args.out,
-        ledger_path=ledger_path,
-        update_ledger=not args.preview,
-        expected_source_summary=expected_source_summary,
-    )
+    try:
+        result = process_signals(
+            signals,
+            out_path=args.out,
+            ledger_path=ledger_path,
+            update_ledger=not args.preview,
+            expected_source_summary=expected_source_summary,
+            allow_duplicate_week=args.force,
+        )
+    except (PausedError, DuplicateWeekError) as error:
+        raise SystemExit(f"Not shipped: {error}") from error
     if result.status == "skipped":
         print(f"Skipped: {result.reason}")
     else:

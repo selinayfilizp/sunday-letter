@@ -126,12 +126,48 @@ class PipelineTests(unittest.TestCase):
             valid_signals(),
             out_path=self.letters / "two.html",
             ledger_path=self.ledger,
+            allow_duplicate_week=True,
         )
 
         self.assertEqual(result1.letter_number, 1)
         self.assertEqual(result2.letter_number, 2)
         self.assertIn("Letter №1", (self.letters / "one.html").read_text())
         self.assertIn("Letter №2", (self.letters / "two.html").read_text())
+
+    def test_duplicate_week_guard_blocks_second_ship(self) -> None:
+        generate_letter.process_signals(
+            valid_signals(), out_path=self.letters / "one.html", ledger_path=self.ledger
+        )
+        with self.assertRaises(generate_letter.DuplicateWeekError):
+            generate_letter.process_signals(
+                valid_signals(), out_path=self.letters / "two.html", ledger_path=self.ledger
+            )
+        skipped = generate_letter.process_signals(
+            {"schema_version": "1.0", "skip": True, "reason": "no meaningful delta"},
+            out_path=None,
+            ledger_path=self.ledger,
+        )
+        self.assertEqual(skipped.status, "skipped")
+
+    def test_duplicate_week_guard_allows_after_window(self) -> None:
+        generate_letter.process_signals(
+            valid_signals(), out_path=self.letters / "one.html", ledger_path=self.ledger
+        )
+        ledger = json.loads(self.ledger.read_text())
+        ledger["last_shipped"] = "2020-01-01"
+        self.ledger.write_text(json.dumps(ledger))
+        result = generate_letter.process_signals(
+            valid_signals(), out_path=self.letters / "two.html", ledger_path=self.ledger
+        )
+        self.assertEqual(result.status, "shipped")
+
+    def test_letter_and_ledger_carry_verified_source_scope(self) -> None:
+        out = self.letters / "letter.html"
+        generate_letter.process_signals(valid_signals(), out_path=out, ledger_path=self.ledger)
+        self.assertIn("selected local Codex threads", out.read_text())
+        self.assertNotIn("Local Codex sources only", out.read_text())
+        ledger = json.loads(self.ledger.read_text())
+        self.assertEqual(ledger["letters"][0]["source"], "selected local Codex threads")
 
     def test_validation_rejects_unmeasured_metrics(self) -> None:
         signals = valid_signals()

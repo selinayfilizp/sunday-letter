@@ -154,6 +154,11 @@ This command performs, in order:
 On a skip, it updates the ledger and archive, writes no letter, and prints the
 reason. Never bypass this command by hand-writing final HTML.
 
+If it refuses with "a letter already shipped" this week, another host (Codex or
+Claude Code) has already written this week's letter. Tell the user instead of
+forcing; only rerun with `--force` when the user explicitly wants a second
+letter this week.
+
 ### 6. Clean working transcripts and deliver locally
 
 After a successful or skipped run, delete the temporary transcript bundle and

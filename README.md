@@ -73,6 +73,11 @@ The skill performs this exact pipeline:
 The runtime owns the letter number. It rejects unmeasured legacy fields such as
 confidence percentages, hours saved, and exports.
 
+Both hosts share one archive. Every ledger entry records which verified source
+scope produced it, and if a letter already shipped in the last six days the
+runtime refuses to ship another without `--force`, so subscribing in Codex and
+Claude Code at once cannot silently double-ship.
+
 ## Inspect the source bundle
 
 Run the collector directly to see exactly what a letter may use. In Codex:

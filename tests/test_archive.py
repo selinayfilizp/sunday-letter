@@ -99,5 +99,55 @@ class ArchiveTests(unittest.TestCase):
             manage_archive.serve_archive(self.root, "0.0.0.0", 8765)
 
 
+
+
+class ArchiveServerHostTests(unittest.TestCase):
+    def test_rejects_unrecognized_host_and_serves_loopback(self) -> None:
+        import http.client
+        import threading
+        from http.server import ThreadingHTTPServer
+
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            manage_archive.build_archive(root)
+            server = ThreadingHTTPServer(
+                ("127.0.0.1", 0), manage_archive._handler(root)
+            )
+            port = server.server_address[1]
+            thread = threading.Thread(target=server.serve_forever, daemon=True)
+            thread.start()
+            try:
+                connection = http.client.HTTPConnection("127.0.0.1", port, timeout=5)
+                connection.request("GET", "/", headers={"Host": "evil.example"})
+                self.assertEqual(connection.getresponse().status, 403)
+                connection.close()
+
+                connection = http.client.HTTPConnection("127.0.0.1", port, timeout=5)
+                connection.request("GET", "/", headers={"Host": f"127.0.0.1:{port}"})
+                self.assertEqual(connection.getresponse().status, 200)
+                connection.close()
+
+                connection = http.client.HTTPConnection("127.0.0.1", port, timeout=5)
+                connection.request(
+                    "POST",
+                    "/action/pause",
+                    body="",
+                    headers={"Host": "evil.example", "Content-Length": "0"},
+                )
+                self.assertEqual(connection.getresponse().status, 403)
+                connection.close()
+            finally:
+                server.shutdown()
+                server.server_close()
+
+    def test_host_allowlist_logic(self) -> None:
+        self.assertTrue(manage_archive._host_allowed("127.0.0.1:8765", 8765))
+        self.assertTrue(manage_archive._host_allowed("localhost:8765", 8765))
+        self.assertTrue(manage_archive._host_allowed("localhost", 8765))
+        self.assertFalse(manage_archive._host_allowed("evil.example:8765", 8765))
+        self.assertFalse(manage_archive._host_allowed("127.0.0.1:9999", 8765))
+        self.assertFalse(manage_archive._host_allowed("", 8765))
+
+
 if __name__ == "__main__":
     unittest.main()

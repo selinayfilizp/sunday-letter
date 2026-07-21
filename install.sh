@@ -38,6 +38,10 @@ install_claude() {
   cp "$PROMPTS_SRC"/*.md "$CLAUDE_HOME/commands/"
   echo "Claude Code: installed skill to $CLAUDE_HOME/skills/sunday-letter"
   echo "Claude Code: installed commands to $CLAUDE_HOME/commands"
+  if [[ -d "$CLAUDE_HOME/plugins/cache/sunday-letter" ]]; then
+    echo "Claude Code: note, the sunday-letter plugin is also installed via /plugin." >&2
+    echo "Claude Code: pick one install method or /sunday-letter may appear twice." >&2
+  fi
 }
 
 case "$TARGET" in
