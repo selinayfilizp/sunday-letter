@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Top-level wrapper for the Sunday Letter renderer."""
+"""Top-level wrapper for the agent-local Sunday Letter renderer."""
 
 from __future__ import annotations
 

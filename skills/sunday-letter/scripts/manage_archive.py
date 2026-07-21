@@ -12,7 +12,14 @@ from pathlib import Path
 from urllib.parse import parse_qs, unquote, urlparse
 from zipfile import ZIP_DEFLATED, ZipFile
 
-from core import atomic_write_text, ensure_private_directory, load_ledger, save_ledger, text
+from core import (
+    atomic_write_text,
+    ensure_private_directory,
+    ledger_lock,
+    load_ledger,
+    save_ledger,
+    text,
+)
 
 
 DEFAULT_ROOT = Path.home() / "sunday-letter"
@@ -124,7 +131,7 @@ def build_archive(root: Path) -> Path:
 </head>
 <body>
 <main class="shell">
-  <div class="eyebrow">Private local archive</div>
+  <div class="eyebrow">Private local agent archive</div>
   <h1>The Sunday Letter</h1>
   <p class="lede">A running record of shipped letters and intentional silence. This page is generated from <code>ledger.json</code> and files under <code>letters/</code>.</p>
   <div class="toolbar">
@@ -146,10 +153,12 @@ def build_archive(root: Path) -> Path:
 
 def set_paused(root: Path, paused: bool) -> None:
     root = root.expanduser().resolve()
-    ledger = load_ledger(_ledger_path(root))
-    ledger["paused"] = paused
-    save_ledger(_ledger_path(root), ledger)
-    build_archive(root)
+    ledger_path = _ledger_path(root)
+    with ledger_lock(ledger_path):
+        ledger = load_ledger(ledger_path)
+        ledger["paused"] = paused
+        save_ledger(ledger_path, ledger)
+        build_archive(root)
 
 
 def archive_status(root: Path) -> str:
@@ -175,24 +184,27 @@ def _safe_letter_path(root: Path, file_value: str) -> Path:
 def delete_letter(root: Path, file_value: str) -> None:
     root = root.expanduser().resolve()
     target = _safe_letter_path(root, file_value)
-    target.unlink(missing_ok=True)
-    ledger = load_ledger(_ledger_path(root))
-    def matches(item: dict[str, object]) -> bool:
-        try:
-            return _safe_letter_path(root, str(item.get("file") or "")) == target
-        except ValueError:
-            return False
+    ledger_path = _ledger_path(root)
+    with ledger_lock(ledger_path):
+        target.unlink(missing_ok=True)
+        ledger = load_ledger(ledger_path)
 
-    matching = next((item for item in ledger["letters"] if matches(item)), None)
-    if matching and matching.get("signals_file"):
-        try:
-            _safe_letter_path(root, str(matching["signals_file"])).unlink(missing_ok=True)
-        except ValueError:
-            pass
-    ledger["letters"] = [item for item in ledger["letters"] if not matches(item)]
-    ledger["events"] = [item for item in ledger["events"] if not matches(item)]
-    save_ledger(_ledger_path(root), ledger)
-    build_archive(root)
+        def matches(item: dict[str, object]) -> bool:
+            try:
+                return _safe_letter_path(root, str(item.get("file") or "")) == target
+            except ValueError:
+                return False
+
+        matching = next((item for item in ledger["letters"] if matches(item)), None)
+        if matching and matching.get("signals_file"):
+            try:
+                _safe_letter_path(root, str(matching["signals_file"])).unlink(missing_ok=True)
+            except ValueError:
+                pass
+        ledger["letters"] = [item for item in ledger["letters"] if not matches(item)]
+        ledger["events"] = [item for item in ledger["events"] if not matches(item)]
+        save_ledger(ledger_path, ledger)
+        build_archive(root)
 
 
 def export_archive(root: Path, out_path: Path) -> Path:

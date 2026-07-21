@@ -1,6 +1,6 @@
 {
   "name": "sunday-letter",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "A private local weekly letter grounded in dated, selected Codex or Claude Code conversations.",
   "author": {
     "name": "The Sunday Letter"

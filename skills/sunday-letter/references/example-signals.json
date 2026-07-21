@@ -10,7 +10,7 @@
     "message_count": 23,
     "window_start": "2026-04-06T00:00:00Z",
     "window_end": "2026-04-12T23:59:59Z",
-    "scope": "selected local Codex threads"
+    "scope": "selected local agent conversations"
   },
   "consequences": [
     {

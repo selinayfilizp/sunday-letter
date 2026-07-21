@@ -148,7 +148,7 @@ This command performs, in order:
 4. Runtime-owned sequential numbering.
 5. Allowlist HTML sanitization and Content Security Policy.
 6. Atomic HTML and signals-record writes under `letters/`.
-7. Atomic `ledger.json` update.
+7. Locked, atomic `ledger.json` update shared by Codex and Claude Code.
 8. Local `index.html` archive rebuild.
 
 On a skip, it updates the ledger and archive, writes no letter, and prints the
