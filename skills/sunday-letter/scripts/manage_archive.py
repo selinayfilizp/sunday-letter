@@ -26,7 +26,7 @@ DEFAULT_ROOT = Path.home() / "sunday-letter"
 
 
 ARCHIVE_CSS = """
-:root { --paper:#eeeae0; --card:#f8f5ec; --ink:#1a1a1a; --muted:#6b6b6b; --green:#1a4c2e; --rule:rgba(26,26,26,.12); }
+:root { --paper:#f7f4ec; --card:#fdfbf5; --ink:#1a1a1a; --muted:#6b6b6b; --green:#1a4c2e; --rule:rgba(26,26,26,.12); }
 * { box-sizing:border-box; }
 body { margin:0; background:var(--paper); color:var(--ink); font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
 .shell { width:min(920px,calc(100% - 32px)); margin:0 auto; padding:52px 0 80px; }

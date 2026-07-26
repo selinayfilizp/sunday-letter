@@ -29,7 +29,10 @@ By default, the runtime creates an owner-readable archive under
 
 Temporary context and signal inputs live under `~/sunday-letter/.working/` and
 the skill instructs the host to remove them after a successful or skipped run.
-The archive server binds to `127.0.0.1` by default.
+The archive server binds to `127.0.0.1` by default. Every request must carry
+a loopback Host header, so DNS rebinding pages cannot read the archive, and
+state-changing actions additionally reject cross-origin and cross-site
+requests.
 
 ## Redaction and rendering
 

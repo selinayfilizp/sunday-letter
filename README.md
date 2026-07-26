@@ -16,9 +16,19 @@ the runtime records a skipped week and writes no letter.
 ## Supported reference paths
 
 Version 0.4 supports two paths end to end, both through the same validated
-pipeline: **local agent state (Codex or Claude Code) → dated and redacted
-context bundle → canonical signals → validated HTML → atomic ledger → private
-local archive**.
+pipeline:
+
+```mermaid
+flowchart LR
+    A[Local Codex state] --> C[Dated, redacted bundle]
+    B[Local Claude Code state] --> C
+    C --> D[Canonical signals]
+    D --> E{Meaningful delta?}
+    E -- no --> F[Silent week recorded]
+    E -- yes --> G[Validated HTML letter]
+    G --> H[Atomic ledger]
+    H --> I[Private local archive]
+```
 
 Cowork, ChatGPT, email delivery, messaging delivery, and cross-agent profile
 export are not supported runtime paths yet. The editorial contract may
